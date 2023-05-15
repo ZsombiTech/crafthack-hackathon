@@ -1,5 +1,7 @@
 # Crafthack hackathon
 
+The public url of the application: https://crafthack-hackathon.vercel.app/
+
 Frontend local setup steps:
 
 1. Navigate into the frontend folder
