@@ -1,5 +1,5 @@
 const fixedInputClass =
-  "rounded-md appearance-none relative block w-full px-2 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:z-10 text-sm placeholder:text-sm";
+  "rounded-md appearance-none relative block w-full px-2 py-2 border border-white placeholder-white text-white focus:z-10 text-sm placeholder:text-sm bg-gray-800";
 
 interface InputProps {
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -24,11 +24,11 @@ export default function Input({
   type,
   isRequired = false,
   placeholder,
-  customClass,
+  customClass = "",
 }: InputProps) {
   return (
-    <div className="my-2">
-      <label htmlFor={labelFor} className="sr-only">
+    <div className="my-2 bg-gray-800">
+      <label htmlFor={labelFor} className="sr-only bg-gray-800">
         {labelText}
       </label>
       <input

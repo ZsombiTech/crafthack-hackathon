@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Input from "../components/Input";
 import { signupFields } from "../assets/formFields";
+import ReactiveButton from "reactive-button";
 
 const fields = signupFields;
 let fieldsState: any = {};
@@ -9,6 +10,7 @@ fields.forEach((field) => (fieldsState[field.id] = ""));
 
 export default function Register() {
   const [registerState, setRegisterState] = useState(fieldsState);
+  const [submitState, setSubmitState] = useState("idle");
 
   const handleChange = (e: any) => {
     setRegisterState({ ...registerState, [e.target.id]: e.target.value });
@@ -16,7 +18,7 @@ export default function Register() {
 
   return (
     <div className="w-full flex justify-center items-center">
-      <div className="flex flex-col mt-12 border border-2 rounded-lg p-4">
+      <div className="flex flex-col mt-12 border border-2 rounded-lg p-10 m-4">
         <Header
           heading="Regiser to your account"
           paragraph="Already have an account? "
@@ -39,9 +41,21 @@ export default function Register() {
             />
           ))}
         </form>
-        <button className="mt-4 text-base bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
-          Register
-        </button>
+        <ReactiveButton
+          buttonState={submitState}
+          type="submit"
+          animation={false}
+          idleText="Register"
+          onClick={() => {
+            setSubmitState("loading");
+            setTimeout(() => {
+              setSubmitState("success");
+            }, 2000);
+          }}
+          color="primary"
+          className="mt-5"
+          rounded
+        />
       </div>
     </div>
   );

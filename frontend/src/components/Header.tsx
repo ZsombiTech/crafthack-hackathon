@@ -15,14 +15,14 @@ export default function Header({
 }: HeaderProps) {
   return (
     <div className="mb-3">
-      <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+      <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
         {heading}
       </h2>
-      <p className="mt-2 text-center text-sm text-gray-600 mt-5">
-        {paragraph}{" "}
+      <p className="mt-2 text-center text-sm text-white mt-5">
+        {paragraph}
         <Link
           to={linkUrl}
-          className="font-medium text-blue-600 hover:text-blue-500"
+          className="ml-3 font-medium text-blue-600 hover:text-blue-500"
         >
           {linkName}
         </Link>

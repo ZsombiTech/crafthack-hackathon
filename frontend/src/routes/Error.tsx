@@ -12,7 +12,9 @@ export default function Error() {
 
   return (
     <div className="w-full flex justify-center mt-4">
-      <h1>Error</h1>
+      <h1 className="text-xl text-white font-bold">
+        PAGE NOT FOUND<span className="text-xl">&#128549;</span>
+      </h1>
     </div>
   );
 }
