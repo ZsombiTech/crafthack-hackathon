@@ -12,3 +12,9 @@ api = FastAPI()
 
 api.include_router(router = auth.router, prefix = "/auth")
 api.include_router(router = user.router, prefix = "/user")
+
+@api.get("/test")
+async def test_get():
+    return {
+        "message": "Hello, world!",
+    }
