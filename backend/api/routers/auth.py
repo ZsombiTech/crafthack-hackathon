@@ -21,6 +21,7 @@ class RegisterPost(BaseModel):
     name: str = None
     staff: bool = False
 
+
 @router.post("/register")
 async def register_post(
     response: Response,
@@ -122,6 +123,7 @@ class LoginPost(BaseModel):
     email: str = None
     password: str = None
     old: str = None
+
 
 @router.post("/login")
 async def login_post(
