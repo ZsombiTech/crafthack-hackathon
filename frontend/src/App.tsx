@@ -4,13 +4,17 @@ import Login from "./routes/Login";
 import Register from "./routes/Register";
 import Error from "./routes/Error";
 import Navbar from "./components/Navbar";
+import { Provider } from "react-redux";
+import store from "./redux/store";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: (
       <>
-        <Navbar />
+        <div className="invisible">
+          <Navbar />
+        </div>
         <Login />
       </>
     ),
@@ -20,7 +24,9 @@ const router = createBrowserRouter([
     path: "/login",
     element: (
       <>
-        <Navbar />
+        <div className="invisible">
+          <Navbar />
+        </div>
         <Login />
       </>
     ),
@@ -29,7 +35,9 @@ const router = createBrowserRouter([
     path: "/register",
     element: (
       <>
-        <Navbar />
+        <div className="invisible">
+          <Navbar />
+        </div>
         <Register />
       </>
     ),
@@ -37,7 +45,11 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
+  );
 }
 
 export default App;
