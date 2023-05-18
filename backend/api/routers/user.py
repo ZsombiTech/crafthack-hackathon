@@ -268,3 +268,109 @@ async def user_participation_post(
     )
 
 
+async def _leave_event(
+    user_id: int,
+    event_id: int,
+):
+    try:
+        participation = await Participation.get(user = user_id, event = event_id)
+    except Participation.DoesNotExist:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    
+    await participation.delete()
+
+
+@router.delete("/me/participation/{event_id}")
+async def user_me_participation_delete(
+    auth: Auth,
+    event_id: int,
+):
+    if not auth.is_authenticated():
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    await _leave_event(auth.user_id, event_id)
+
+
+@router.delete("/{user_id}/participation/{event_id}")
+async def user_participation_delete(
+    auth: Auth,
+    user_id: int,
+    event_id: int,
+):
+    if not auth.is_authenticated():
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if not auth.is_staff() and auth.user_id != user_id:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    
+    await _leave_event(user_id, event_id)
+
+
+async def _patch_participation(
+    user_id: int,
+    event_id: int,
+    format: str = None,
+    needs_teammates: bool = None,
+    description: str = None,
+):
+    try:
+        participation = await Participation.get(user = user_id, event = event_id)
+    except Participation.DoesNotExist:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    if format is not None:
+        participation.format = format
+
+    if needs_teammates is not None:
+        participation.needs_teammates = needs_teammates
+
+    if description is not None:
+        participation.description = description
+
+    await participation.save()
+
+
+class UserParticipatePatch(BaseModel):
+    format: str = None
+    needs_teammates: bool = None
+    description: str = None
+
+
+@router.patch("/me/participation/{event_id}")
+async def user_me_participation_patch(
+    auth: Auth,
+    event_id: int,
+    body: UserParticipatePatch,
+):
+    if not auth.is_authenticated():
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    await _patch_participation(
+        auth.user_id,
+        event_id,
+        body.format,
+        body.needs_teammates,
+        body.description,
+    )
+
+
+@router.patch("/{user_id}/participation/{event_id}")
+async def user_participation_patch(
+    auth: Auth,
+    user_id: int,
+    event_id: int,
+    body: UserParticipatePatch,
+):
+    if not auth.is_authenticated():
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if not auth.is_staff() and auth.user_id != user_id:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    
+    await _patch_participation(
+        user_id,
+        event_id,
+        body.format,
+        body.needs_teammates,
+        body.description,
+    )
