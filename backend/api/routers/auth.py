@@ -77,6 +77,7 @@ async def _login_password(
     )
     return {
         "user_id": user.id,
+        "token": token
     }
 
 
