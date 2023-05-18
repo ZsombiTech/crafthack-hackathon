@@ -205,8 +205,7 @@ async def _join_event(
     needs_teammates: bool,
     description: str,
 ):
-    """Participation(
+    Participation(
         user = user_id,
         event = event_id,
-
-    )"""
+    )
