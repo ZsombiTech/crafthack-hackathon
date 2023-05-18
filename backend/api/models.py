@@ -153,6 +153,3 @@ class Participation(AIOModel):
 
     class Meta:
         table_name = "participations"
-        indexes = (
-            (("user", "event"), True),
-        )

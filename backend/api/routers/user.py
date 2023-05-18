@@ -39,7 +39,7 @@ async def user_me_get(
 @router.get("/{user_id}")
 async def user_get(
     auth: Auth,
-    user_id: str,
+    user_id: int,
 ):
     if not auth.is_authenticated():
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
@@ -140,7 +140,7 @@ async def user_me_patch(
 @router.patch("/{user_id}")
 async def user_patch(
     auth: Auth,
-    user_id: str,
+    user_id: int,
     body: UserPatch,
 ):
     if not auth.is_authenticated():
@@ -165,7 +165,10 @@ async def user_patch(
 async def _get_participations(
     user_id: int
 ):
-    participations = await Participation.select().where(user = user_id)
+    user = await User.get_by_id(user_id)
+
+    participations = await Participation.select().where(Participation.user == user)
+
     return [
         {
             "id": participation.id
