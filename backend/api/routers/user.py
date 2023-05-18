@@ -39,8 +39,8 @@ async def user_get(
     auth: Auth,
     user_id: str,
 ):
-    #if not auth.is_authenticated():
-    #    return HTTPException(status.HTTP_401_UNAUTHORIZED)
+    if not auth.is_authenticated():
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     try:
         user = await User.get_by_id(user_id)

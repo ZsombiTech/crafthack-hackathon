@@ -2,6 +2,5 @@ fastapi
 uvicorn[standard]
 orjson
 peewee-aio[asyncpg]
-supabase
 py-bcrypt
 pyjwt

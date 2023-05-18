@@ -15,7 +15,6 @@ router = APIRouter(
 
 @router.post("/register")
 async def register_post(
-    request: Request,
     auth: Auth,
     email: str,
     password: str,

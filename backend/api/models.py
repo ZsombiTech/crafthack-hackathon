@@ -10,12 +10,6 @@ manager = Manager(
     url = Config.db_url,
 )
 
-import supabase
-supabase_client = supabase.create_client(
-    Config.supabase_url,
-    Config.supabase_key
-)
-
 import bcrypt
 import jwt
 import time
