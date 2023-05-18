@@ -50,7 +50,8 @@ async def register_post(
         value = token,
         max_age = 400 * 24 * 3600,
         httponly = True,
-        samesite = "Strict",
+        samesite = "None",
+        secure = True
     )
     return {
         "user_id": user.id,
@@ -88,7 +89,8 @@ async def _login_password(
         value = token,
         max_age = 400 * 24 * 3600,
         httponly = True,
-        samesite = "Strict",
+        samesite = "None",
+        secure = True
     )
     return {
         "user_id": user.id,
@@ -111,7 +113,8 @@ async def _login_reissue(
         value = new,
         max_age = 400 * 24 * 3600,
         httponly = True,
-        samesite = "Strict",
+        samesite = "None",
+        secure = True
     )
     return {
         "user_id": user_id,

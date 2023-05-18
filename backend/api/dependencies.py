@@ -5,7 +5,9 @@ from api.models import Permissions, User
 
 def authenticate_request(request: Request):
     try:
-        return User.authenticate_token(request.cookies["token"])
+        token = request.headers["Authorization"].split(" ")[1]
+        #token = request.cookies["token"]
+        return User.authenticate_token(token)
     except KeyError:
         return Permissions()
     

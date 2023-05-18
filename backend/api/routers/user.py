@@ -3,7 +3,7 @@ from fastapi.responses import ORJSONResponse
 
 from pydantic import BaseModel
 
-from api.models import User, Participation
+from api.models import User, Participation, Event
 from api.dependencies import Auth
 
 import time
@@ -205,7 +205,66 @@ async def _join_event(
     needs_teammates: bool,
     description: str,
 ):
-    Participation(
+    # check if event exists
+    try:
+        event = await Event.get_by_id(event_id)
+    except Event.DoesNotExist:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    participation = Participation(
         user = user_id,
         event = event_id,
+        format = format,
+        needs_teammates = needs_teammates,
+        description = description,
     )
+    await participation.save()
+
+
+class UserParticipatePost(BaseModel):
+    event_id: int
+    format: str
+    needs_teammates: bool = False
+    description: str = None
+
+
+@router.post("/me/participation/{event_id}")
+async def user_me_participation_post(
+    auth: Auth,
+    event_id: int,
+    body: UserParticipatePost,
+):
+    if not auth.is_authenticated():
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    await _join_event(
+        auth.user_id,
+        event_id,
+        body.format,
+        body.needs_teammates,
+        body.description,
+    )
+
+
+@router.post("/{user_id}/participation/{event_id}")
+async def user_participation_post(
+    auth: Auth,
+    user_id: int,
+    event_id: int,
+    body: UserParticipatePost,
+):
+    if not auth.is_authenticated():
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if not auth.is_staff() and auth.user_id != user_id:
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+    
+    await _join_event(
+        user_id,
+        event_id,
+        body.format,
+        body.needs_teammates,
+        body.description,
+    )
+
+
