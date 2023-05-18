@@ -23,6 +23,7 @@ class RegisterPost(BaseModel):
 
 @router.post("/register")
 async def register_post(
+    response: Response,
     auth: Auth,
     body: RegisterPost,
 ):
@@ -41,6 +42,18 @@ async def register_post(
     )
     user.set_password(body.password)
     await user.save()
+
+    token = await User.issue_token(user.id)
+    response.set_cookie(
+        key = "token",
+        value = token,
+        max_age = 400 * 24 * 3600,
+        httponly = True,
+        samesite = "Strict",
+    )
+    return {
+        "user_id": user.id
+    }
 
 
 async def _login_password(
@@ -76,8 +89,7 @@ async def _login_password(
         samesite = "Strict",
     )
     return {
-        "user_id": user.id,
-        "token": token
+        "user_id": user.id
     }
 
 
