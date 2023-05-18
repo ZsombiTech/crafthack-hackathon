@@ -2,10 +2,17 @@ import React, { useState } from "react";
 import LogoLogin from "../assets/images/logoLogin.svg";
 import MenuIcon from "../assets/images/menuIcon.svg";
 import { Link, useLocation } from "react-router-dom";
+import AttendeesIcon from "../assets/images/attendeesIcon.svg";
+import { useDispatch, useSelector } from "react-redux";
+import { setHackathon } from "../redux/actions/userAction";
+import SettingIcon from "../assets/images/settings.svg";
+import SignOutLogo from "../assets/images/signOut.svg";
 
 export default function Sidebar() {
+  const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
-  const isMobile = window.innerWidth < 900;
+  const hackathon = useSelector((state: any) => state.hackathon);
+  const isMobile = window.innerWidth < 1270;
   const location = useLocation();
   const handleSignOut = () => {};
 
@@ -67,57 +74,108 @@ export default function Sidebar() {
           />
           <div className="w-full h-px bg-background mt-8 mx-auto"></div>
           <div className="lg:visible flex flex-col items-start ml-5 md:ml-5 w-full mt-8">
-            <Link
-              to="/"
-              className={`flex items-center mt-3 w-3/4 justify-start py-1.5 pl-2 md:pl-5 rounded-md hover:bg-accent ${
-                location.pathname === "/" ? "bg-accent" : ""
-              }`}
-              onClick={() => setIsOpen(false)}
-            >
-              <img src={MenuIcon} alt="Menu" className="w-4" />
-              <p className="text-background font-semibold text-sm ml-2">
-                Hackathons
-              </p>
-            </Link>
-            <Link
-              to="/attendees"
-              className={`flex items-center mt-3 w-3/4 py-1.5 justify-start pl-2 md:pl-5 rounded-md hover:bg-accent ${
-                location.pathname === "/attendees" ? "bg-accent" : ""
-              }`}
-              onClick={() => setIsOpen(false)}
-            >
-              <img src={MenuIcon} alt="Menu" className="w-4" />
-              <p className="text-background font-semibold text-sm ml-2">
-                Attendees
-              </p>
-            </Link>
-          </div>
-          <div className="bottom-0 absolute mb-8 w-full">
-            <div className="flex flex-col items-start ml-5 md:ml-5 w-full mt-8">
+            {!hackathon ? (
               <Link
-                to="/settings"
-                className={`flex items-center w-3/4 py-1.5 justify-start pl-2 md:pl-5 rounded-md hover:bg-accent ${
-                  location.pathname === "/settings" ? "bg-accent" : ""
+                to="/"
+                className={`flex items-center mt-3 w-3/4 justify-start py-1.5 pl-2 md:pl-5 rounded-md hover:bg-accent ${
+                  location.pathname === "/" ? "bg-accent" : ""
                 }`}
                 onClick={() => setIsOpen(false)}
               >
                 <img src={MenuIcon} alt="Menu" className="w-4" />
                 <p className="text-background font-semibold text-sm ml-2">
-                  Settings
+                  Hackathons
                 </p>
               </Link>
-              <button
-                onClick={() => {
-                  setIsOpen(false);
-                  handleSignOut();
-                }}
-                className="flex items-center mt-4 w-3/4 py-1.5 justify-start pl-2 md:pl-5 rounded-md hover:bg-accent"
-              >
-                <img src={MenuIcon} alt="Menu" className="w-4" />
-                <p className="text-background font-semibold text-sm ml-2">
-                  Sign out
-                </p>
-              </button>
+            ) : (
+              <>
+                <Link
+                  to="/dashboard"
+                  className={`flex items-center mt-3 w-3/4 justify-start py-1.5 pl-2 md:pl-5 rounded-md hover:bg-accent ${
+                    location.pathname === "/dashboard" ? "bg-accent" : ""
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <img src={MenuIcon} alt="Menu" className="w-4" />
+                  <p className="text-background font-semibold text-sm ml-2">
+                    Dashboard
+                  </p>
+                </Link>
+                <Link
+                  to="/attendees"
+                  className={`flex items-center mt-3 w-3/4 py-1.5 justify-start pl-2 md:pl-5 rounded-md hover:bg-accent ${
+                    location.pathname === "/attendees" ? "bg-accent" : ""
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <img src={AttendeesIcon} alt="Menu" className="w-4" />
+                  <p className="text-background font-semibold text-sm ml-2">
+                    Attendees
+                  </p>
+                </Link>
+              </>
+            )}
+          </div>
+          <div className="bottom-0 absolute mb-8 w-full">
+            <div className="flex flex-col items-start ml-5 md:ml-5 w-full mt-8">
+              {!hackathon ? (
+                <>
+                  <Link
+                    to="/settings"
+                    className={`flex items-center w-3/4 py-1.5 justify-start pl-2 md:pl-5 rounded-md hover:bg-accent ${
+                      location.pathname === "/settings" ? "bg-accent" : ""
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <img src={SettingIcon} alt="Menu" className="w-4" />
+                    <p className="text-background font-semibold text-sm ml-2">
+                      Settings
+                    </p>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      handleSignOut();
+                    }}
+                    className="flex items-center mt-4 w-3/4 py-1.5 justify-start pl-2 md:pl-5 rounded-md hover:bg-accent"
+                  >
+                    <img src={SignOutLogo} alt="Menu" className="w-4" />
+                    <p className="text-background font-semibold text-sm ml-2">
+                      Sign out
+                    </p>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/settings"
+                    className={`flex items-center w-3/4 py-1.5 justify-start pl-2 md:pl-5 rounded-md hover:bg-accent ${
+                      location.pathname === "/settings" ? "bg-accent" : ""
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <img src={SettingIcon} alt="Menu" className="w-5" />
+                    <p className="text-background font-semibold text-sm ml-2">
+                      Preferences
+                    </p>
+                  </Link>
+                  <Link
+                    to="/"
+                    className={`flex items-center w-3/4 mt-4 py-1.5 justify-start pl-2 md:pl-5 rounded-md hover:bg-accent ${
+                      location.pathname === "/settings" ? "bg-accent" : ""
+                    }`}
+                    onClick={() => {
+                      dispatch(setHackathon(null));
+                      setIsOpen(false);
+                    }}
+                  >
+                    <img src={SignOutLogo} alt="Menu" className="w-4" />
+                    <p className="text-background font-semibold text-sm ml-2">
+                      Back to all
+                    </p>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </>

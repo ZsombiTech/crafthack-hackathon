@@ -19,10 +19,19 @@ export const register = async (
 ) => {
   try {
     const response = await axios.post("/auth/register", {
-      fullname,
+      name: fullname,
       email,
       password,
     });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserProfile = async () => {
+  try {
+    const response = await axios.get("/user/me");
     return response;
   } catch (error) {
     throw error;

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Input from "../components/Input";
 import { signupFields } from "../assets/helpers/formFields";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { register } from "../api/user";
 
 const fields = signupFields;
@@ -10,6 +10,7 @@ let fieldsState: any = {};
 fields.forEach((field) => (fieldsState[field.id] = ""));
 
 export default function Register() {
+  const navigate = useNavigate();
   const [registerState, setRegisterState] = useState(fieldsState);
 
   const handleChange = (e: any) => {
@@ -25,7 +26,7 @@ export default function Register() {
     )
       return alert("Please fill all the fields");
 
-    if (registerState.password !== registerState.confirmPassword)
+    if (registerState.password !== registerState.confirmpassword)
       return alert("Passwords do not match");
 
     const response = await register(
@@ -34,7 +35,8 @@ export default function Register() {
       registerState.password
     );
 
-    console.log(response);
+    document.cookie = `token=${response.data.token}`;
+    navigate("/");
   };
 
   return (

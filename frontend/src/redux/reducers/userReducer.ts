@@ -1,4 +1,4 @@
-import { SET_USER_PROFILE } from "../actionTypes/actionTypes";
+import { SET_USER_PROFILE, SET_HACKATHON } from "../actionTypes/actionTypes";
 
 interface ActionType {
   type: string;
@@ -7,6 +7,7 @@ interface ActionType {
 
 const initialState = {
   userProfile: null,
+  hackathon: null,
 };
 
 export const UserReducer = (state = initialState, action: ActionType) => {
@@ -15,6 +16,11 @@ export const UserReducer = (state = initialState, action: ActionType) => {
       return {
         ...state,
         userProfile: action.payload,
+      };
+    case SET_HACKATHON:
+      return {
+        ...state,
+        hackathon: action.payload,
       };
 
     default:

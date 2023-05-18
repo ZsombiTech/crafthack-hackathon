@@ -10,13 +10,17 @@ import Home from "./routes/Home";
 import Sidebar from "./components/Sidebar";
 import Attendees from "./routes/Attendees";
 import Settings from "./routes/Settings";
+import Dashboard from "./routes/Dashboard";
+import MobileSidebar from "./components/MobileSidebar";
+
+const isMobile = window.innerWidth < 1270;
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: (
       <div className="flex">
-        <Sidebar />
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
         <Home />
       </div>
     ),
@@ -48,7 +52,7 @@ const router = createBrowserRouter([
     path: "/attendees",
     element: (
       <div className="flex">
-        <Sidebar />
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
         <Attendees />
       </div>
     ),
@@ -57,8 +61,17 @@ const router = createBrowserRouter([
     path: "/settings",
     element: (
       <div className="flex">
-        <Sidebar />
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
         <Settings />
+      </div>
+    ),
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <div className="flex">
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
+        <Dashboard />
       </div>
     ),
   },

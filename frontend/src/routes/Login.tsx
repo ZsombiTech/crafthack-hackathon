@@ -4,7 +4,7 @@ import Input from "../components/Input";
 import { loginFields } from "../assets/helpers/formFields";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserProfile } from "../redux/actions/userAction";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { login } from "../api/user";
 
 const fields = loginFields;
@@ -12,7 +12,7 @@ let fieldsState: any = {};
 fields.forEach((field) => (fieldsState[field.id] = ""));
 
 export default function Login() {
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [loginState, setLoginState] = useState(fieldsState);
 
   const handleChange = (e: any) => {
@@ -25,7 +25,8 @@ export default function Login() {
 
     const response = await login(loginState.email, loginState.password);
 
-    console.log(response);
+    document.cookie = `token=${response.data.token}`;
+    navigate("/");
   };
 
   return (

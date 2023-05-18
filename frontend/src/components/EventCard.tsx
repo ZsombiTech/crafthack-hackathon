@@ -1,4 +1,7 @@
 import React from "react";
+import { setHackathon } from "../redux/actions/userAction";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 interface EventCardProps {
   img: string;
@@ -15,12 +18,21 @@ export default function EventCard({
   prize,
   participants,
 }: EventCardProps) {
-  const isMobile = window.innerWidth < 900;
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isMobile = window.innerWidth < 1270;
+
+  const handleChooseHackathon = (hackathon: string) => {
+    dispatch(setHackathon(hackathon));
+    navigate("/dashboard");
+  };
+
   return (
     <div
       className={`w-full flex items-center mt-4 p-6 rounded-lg ${
         !isMobile && "bg-dark-lightest border-primary border-2"
       }`}
+      onClick={() => handleChooseHackathon(name)}
     >
       <img src={img} alt="Event" className="w-64" />
       <div className="flex flex-col justify-start items-center ml-8 shrink-0">
