@@ -165,7 +165,7 @@ async def user_patch(
 async def _get_participations(
     user_id: int
 ):
-    participations = await Participation.filter(user = user_id)
+    participations = await Participation.select().where(user = user_id)
     return [
         {
             "id": participation.id

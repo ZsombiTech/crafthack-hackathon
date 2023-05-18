@@ -5,7 +5,7 @@ export default function Attendees() {
   const isMobile = window.innerWidth < 1270;
 
   return (
-    <div className={`w-full ${isMobile ? "ml-10" : "ml-40 md:ml-48"}`}>
+    <div className={`w-full ${isMobile ? "ml-0" : "ml-40 md:ml-48"}`}>
       <h1 className="text-center text-3xl font-semibold my-10">Attendees</h1>
       <div className="flex justify-center items-center mt-2">
         <div className="eventcontainerscroll overflow-y-scroll mt-3 h-[34rem] w-11/12 bg-dark-lightest border-2 border-primary rounded-lg px-5">

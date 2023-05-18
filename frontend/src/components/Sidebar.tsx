@@ -1,20 +1,64 @@
 import React, { useState } from "react";
 import LogoLogin from "../assets/images/logoLogin.svg";
 import MenuIcon from "../assets/images/menuIcon.svg";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import AttendeesIcon from "../assets/images/attendeesIcon.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { setHackathon } from "../redux/actions/userAction";
+import { setHackathon, setUserProfile } from "../redux/actions/userAction";
 import SettingIcon from "../assets/images/settings.svg";
 import SignOutLogo from "../assets/images/signOut.svg";
 
+const setCookie = (
+  key: any,
+  value: any,
+  expireDays: any,
+  expireHours: any,
+  expireMinutes: any,
+  expireSeconds: any
+) => {
+  var expireDate = new Date();
+  if (expireDays) {
+    expireDate.setDate(expireDate.getDate() + expireDays);
+  }
+  if (expireHours) {
+    expireDate.setHours(expireDate.getHours() + expireHours);
+  }
+  if (expireMinutes) {
+    expireDate.setMinutes(expireDate.getMinutes() + expireMinutes);
+  }
+  if (expireSeconds) {
+    expireDate.setSeconds(expireDate.getSeconds() + expireSeconds);
+  }
+  document.cookie =
+    key +
+    "=" +
+    escape(value) +
+    ";domain=" +
+    window.location.hostname +
+    ";path=/" +
+    ";expires=" +
+    expireDate.toUTCString();
+};
+
+function deleteCookie(name: string) {
+  setCookie(name, "", null, null, null, 1);
+}
+
 export default function Sidebar() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const hackathon = useSelector((state: any) => state.hackathon);
   const isMobile = window.innerWidth < 1270;
   const location = useLocation();
-  const handleSignOut = () => {};
+
+  const handleSignOut = () => {
+    deleteCookie("token");
+    dispatch(setHackathon(null));
+    dispatch(setUserProfile(null));
+    navigate("/login");
+    window.location.reload();
+  };
 
   return (
     <div
@@ -161,9 +205,7 @@ export default function Sidebar() {
                   </Link>
                   <Link
                     to="/"
-                    className={`flex items-center w-3/4 mt-4 py-1.5 justify-start pl-2 md:pl-5 rounded-md hover:bg-accent ${
-                      location.pathname === "/settings" ? "bg-accent" : ""
-                    }`}
+                    className={`flex items-center w-3/4 mt-4 py-1.5 justify-start pl-2 md:pl-5 rounded-md hover:bg-accent`}
                     onClick={() => {
                       dispatch(setHackathon(null));
                       setIsOpen(false);

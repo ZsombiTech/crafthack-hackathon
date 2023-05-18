@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Input from "../components/Input";
 import { loginFields } from "../assets/helpers/formFields";
-import { useDispatch, useSelector } from "react-redux";
-import { setUserProfile } from "../redux/actions/userAction";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../api/user";
 
@@ -14,6 +12,15 @@ fields.forEach((field) => (fieldsState[field.id] = ""));
 export default function Login() {
   const navigate = useNavigate();
   const [loginState, setLoginState] = useState(fieldsState);
+
+  useEffect(() => {
+    const cookies = document.cookie;
+    const token = cookies.split(";").find((item) => {
+      const key = item.split("=")[0];
+      return key.trim() === "token";
+    });
+    if (token) navigate("/");
+  }, [navigate]);
 
   const handleChange = (e: any) => {
     setLoginState({ ...loginState, [e.target.id]: e.target.value });

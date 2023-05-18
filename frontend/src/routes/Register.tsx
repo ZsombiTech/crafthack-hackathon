@@ -37,6 +37,7 @@ export default function Register() {
 
     document.cookie = `token=${response.data.token}`;
     navigate("/");
+    window.location.reload();
   };
 
   return (
