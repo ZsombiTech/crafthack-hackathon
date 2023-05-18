@@ -70,10 +70,8 @@ export default function EventCard({
       navigate("/chat");
       return;
     } else {
-      console.log(data);
-      console.log(id);
       for (let i = 0; i < data.length; i++) {
-        if (data[i].id === id) {
+        if (data[i].event.__data__.event === id) {
           navigate("/dashboard");
           return;
         }

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ChatComp } from "../components/Message";
 import { getChat, postChat } from "../api/chat";
+import { useNavigate } from "react-router-dom";
 
 interface Message {
   message: string;
@@ -8,10 +9,12 @@ interface Message {
 }
 
 export default function Chat() {
+  const navigation = useNavigate();
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState<string>("");
   const messagesContainer = useRef<HTMLDivElement>(null);
   const isMobile = window.innerWidth < 1270;
+  const [waiting, setWaiting] = useState<boolean>(false);
 
   useEffect(() => {
     if (messagesContainer.current) {
@@ -35,6 +38,7 @@ export default function Chat() {
   }, []);
 
   const handleSendMessage = async () => {
+    setWaiting(true);
     setMessage("");
     const messagess = [];
     const messageSend = {
@@ -43,12 +47,18 @@ export default function Chat() {
     };
     messagess.push(messageSend);
     const { data } = await postChat(message);
+    if (data.message.includes("<END_CONVERSATION>")) {
+      setTimeout(() => {
+        navigation("/dashboard");
+      }, 3000);
+    }
     const currentMessage = {
       message: data.message,
       isFromUser: false,
     };
     messagess.push(currentMessage);
     setCurrentMessages([...currentMessages, ...messagess]);
+    setWaiting(false);
   };
 
   return (
@@ -79,17 +89,23 @@ export default function Chat() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
-          <button
-            className="py-3 px-8 rounded-lg bg-accent text-background font-semibold"
-            onClick={handleSendMessage}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSendMessage();
-              }
-            }}
-          >
-            Send
-          </button>
+          {waiting ? (
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-accent"></div>
+            </div>
+          ) : (
+            <button
+              className="py-3 px-8 rounded-lg bg-accent text-background font-semibold"
+              onClick={handleSendMessage}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSendMessage();
+                }
+              }}
+            >
+              Send
+            </button>
+          )}
         </div>
       </div>
     </div>

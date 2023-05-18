@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AttendeeCard from "../components/AttendeeCard";
+import { getAllParticipantsForEvent } from "../api/event";
+import { useSelector } from "react-redux";
 
 export default function Attendees() {
   const isMobile = window.innerWidth < 1270;
+  const [attendees, setAttendees] = useState([]);
+  const hackathon = useSelector((state: any) => state.hackathon);
 
   return (
     <div className={`w-full ${isMobile ? "ml-0" : "ml-40 md:ml-48"}`}>
