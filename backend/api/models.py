@@ -122,3 +122,19 @@ class User(AIOModel):
             return bcrypt.checkpw(plain.encode("utf8"), self.password.encode("utf8"))
         except:
             return False
+
+
+@manager.register
+class Event(AIOModel):
+    id = fields.AutoField()
+    title = fields.CharField()
+    start_time = fields.IntegerField()
+    end_time = fields.IntegerField()
+    format = fields.CharField()
+    prize = fields.IntegerField()
+    participants = fields.IntegerField()
+    thumbnail = fields.CharField()
+    description = fields.TextField()
+
+    class Meta:
+        table_name = "events"

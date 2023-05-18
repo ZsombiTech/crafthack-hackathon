@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Request, Response, HTTPException, status
 from fastapi.responses import ORJSONResponse
 
+from pydantic import BaseModel
+
 from api.models import User
 from api.dependencies import Auth
 
@@ -13,32 +15,39 @@ router = APIRouter(
 )
 
 
+class RegisterPost(BaseModel):
+    email: str = None
+    password: str = None
+    name: str = None
+    staff: bool = False
+
 @router.post("/register")
 async def register_post(
     auth: Auth,
-    email: str,
-    password: str,
-    name: str,
-    staff: bool = False,
+    body: RegisterPost,
 ):
-    if staff is True and not auth.is_staff():
+    if body.staff is True and not auth.is_staff():
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
-    email = email.lower()
+    email = body.email.lower()
     if len(await User.filter(email = email)) > 0:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Email already used.")
 
     user = User(
         email = email,
-        name = name,
-        staff = staff,
+        name = body.name,
+        staff = body.staff,
         last_modified = int(time.time()),
     )
-    user.set_password(password)
+    user.set_password(body.password)
     await user.save()
 
 
-async def _login_password(response: Response, email: str, password: str):
+async def _login_password(
+    response: Response, 
+    email: str, 
+    password: str
+):
     try:
         email = email.lower()
         user = await User.get(email = email)
@@ -71,7 +80,10 @@ async def _login_password(response: Response, email: str, password: str):
     }
 
 
-async def _login_reissue(response: Response, token: str):
+async def _login_reissue(
+    response: Response, 
+    token: str
+):
     new, user_id = await User.reissue_token(token)
     if new is None:
         raise HTTPException(
@@ -90,18 +102,21 @@ async def _login_reissue(response: Response, token: str):
     }
 
 
-@router.get("/login")
-async def login_get(
-    response: Response, 
-    email: str = None, 
-    password: str = None, 
-    old: str = None, 
-):
-    if email is not None and password is not None:
-        return await _login_password(response, email, password)
+class LoginPost(BaseModel):
+    email: str = None
+    password: str = None
+    old: str = None
 
-    if old is not None:
-        return await _login_reissue(response, old)
+@router.post("/login")
+async def login_post(
+    response: Response, 
+    body: LoginPost,
+):
+    if body.email is not None and body.password is not None:
+        return await _login_password(response, body.email, body.password)
+
+    if body.old is not None:
+        return await _login_reissue(response, body.old)
     
     raise HTTPException(
         status.HTTP_400_BAD_REQUEST,
