@@ -3,7 +3,7 @@ from fastapi.responses import ORJSONResponse
 
 from pydantic import BaseModel
 
-from api.models import User
+from api.models import User, Participation
 from api.dependencies import Auth
 
 import time
@@ -160,3 +160,46 @@ async def user_patch(
 
     await _user_patch(auth, user, body.email, 
                       body.password, body.name, body.staff)
+
+
+async def _get_participations(
+    user_id: int
+):
+    participations = await Participation.filter(user = user_id)
+    return [
+        {
+            "id": participation.id
+        }
+        for participation in participations
+    ]
+
+
+@router.get("/me/participation")
+async def user_me_participations_get(
+    auth: Auth,
+):
+    if not auth.is_authenticated():
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    return await _get_participations(auth.user_id)
+
+
+@router.get("/{user_id}/participation")
+async def user_participations_get(
+    auth: Auth,
+    user_id: int,
+):
+    if not auth.is_authenticated():
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if not auth.is_staff() and auth.user_id != user_id:
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+    
+    return await _get_participations(user_id)
+
+
+async def _join_event(
+    user_id: int,
+    event_id: int,
+):
+    pass

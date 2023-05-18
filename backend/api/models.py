@@ -130,7 +130,7 @@ class Event(AIOModel):
     title = fields.CharField()
     start_time = fields.IntegerField()
     end_time = fields.IntegerField()
-    format = fields.CharField()
+    format = fields.CharField() # hybrid or online
     prize = fields.IntegerField()
     participants = fields.IntegerField()
     thumbnail = fields.CharField()
@@ -138,3 +138,22 @@ class Event(AIOModel):
 
     class Meta:
         table_name = "events"
+
+
+@manager.register
+class Participation(AIOModel):
+    id = fields.AutoField()
+    user = fields.ForeignKeyField(User)
+    event = fields.ForeignKeyField(Event)
+    format = fields.CharField() # offline or online
+    confirmed = fields.BooleanField(default = False)
+    tax_number = fields.CharField()
+
+    needs_teammates = fields.BooleanField(default = False)
+    description = fields.TextField()
+
+    class Meta:
+        table_name = "participations"
+        indexes = (
+            (("user", "event"), True),
+        )
