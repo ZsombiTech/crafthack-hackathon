@@ -4,7 +4,6 @@ Async PostgreSQL ORM and models.
 
 from api.config import Config
 
-import peewee
 from peewee_aio import Manager, AIOModel, fields
 manager = Manager(
     url = Config.db_url,

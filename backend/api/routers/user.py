@@ -201,5 +201,12 @@ async def user_participations_get(
 async def _join_event(
     user_id: int,
     event_id: int,
+    format: str,
+    needs_teammates: bool,
+    description: str,
 ):
-    pass
+    """Participation(
+        user = user_id,
+        event = event_id,
+
+    )"""

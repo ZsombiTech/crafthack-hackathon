@@ -52,7 +52,8 @@ async def register_post(
         samesite = "Strict",
     )
     return {
-        "user_id": user.id
+        "user_id": user.id,
+        "token": token
     }
 
 
@@ -89,7 +90,8 @@ async def _login_password(
         samesite = "Strict",
     )
     return {
-        "user_id": user.id
+        "user_id": user.id,
+        "token": token
     }
 
 
@@ -112,6 +114,7 @@ async def _login_reissue(
     )
     return {
         "user_id": user_id,
+        "token": new
     }
 
 
