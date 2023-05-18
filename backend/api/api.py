@@ -2,9 +2,7 @@
 API entry point.
 """
 
-from .config import Config
-from .models import supabase_client
-from .routers import auth, user
+from api.routers import auth, user
 
 from fastapi import FastAPI
 

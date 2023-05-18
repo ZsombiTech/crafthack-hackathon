@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Request, Response, HTTPException, status
 from fastapi.responses import ORJSONResponse
 
-from ..models import User
-from ..dependencies import Auth
+from api.models import User
+from api.dependencies import Auth
 
 import time
 

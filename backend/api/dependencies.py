@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import Depends, Request
 
-from .models import Permissions, User
+from api.models import Permissions, User
 
 def authenticate_request(request: Request):
     try:

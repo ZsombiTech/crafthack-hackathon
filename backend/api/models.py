@@ -2,7 +2,7 @@
 Async PostgreSQL ORM and models.
 """
 
-from .config import Config
+from api.config import Config
 
 import peewee
 from peewee_aio import Manager, AIOModel, fields
