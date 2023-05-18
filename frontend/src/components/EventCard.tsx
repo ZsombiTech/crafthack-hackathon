@@ -15,8 +15,13 @@ export default function EventCard({
   prize,
   participants,
 }: EventCardProps) {
+  const isMobile = window.innerWidth < 900;
   return (
-    <div className="w-full flex items-center mt-4 p-6 rounded-lg bg-dark-lightest border-primary border-2">
+    <div
+      className={`w-full flex items-center mt-4 p-6 rounded-lg ${
+        !isMobile && "bg-dark-lightest border-primary border-2"
+      }`}
+    >
       <img src={img} alt="Event" className="w-64" />
       <div className="flex flex-col justify-start items-center ml-8 shrink-0">
         <div className="w-full">

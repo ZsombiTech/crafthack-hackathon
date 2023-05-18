@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import Input from "../components/Input";
 import { signupFields } from "../assets/helpers/formFields";
 import { Link } from "react-router-dom";
+import { register } from "../api/user";
 
 const fields = signupFields;
 let fieldsState: any = {};
@@ -15,8 +16,7 @@ export default function Register() {
     setRegisterState({ ...registerState, [e.target.id]: e.target.value });
   };
 
-  const handleRegister = () => {
-    console.log(registerState);
+  const handleRegister = async () => {
     if (
       !registerState.fullname ||
       !registerState.email ||
@@ -27,6 +27,14 @@ export default function Register() {
 
     if (registerState.password !== registerState.confirmPassword)
       return alert("Passwords do not match");
+
+    const response = await register(
+      registerState.fullname,
+      registerState.email,
+      registerState.password
+    );
+
+    console.log(response);
   };
 
   return (

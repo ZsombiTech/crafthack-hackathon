@@ -12,18 +12,16 @@ export const login = async (email: string, password: string) => {
   }
 };
 
-export const signup = async (
+export const register = async (
   fullname: string,
   email: string,
-  password: string,
-  confirmPassword: string
+  password: string
 ) => {
   try {
-    const response = await axios.post("/auth/signup", {
+    const response = await axios.post("/auth/register", {
       fullname,
       email,
       password,
-      confirmPassword,
     });
     return response;
   } catch (error) {

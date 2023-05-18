@@ -4,8 +4,12 @@ import CraftHack from "../assets/images/craftHack.png";
 import JunctionX from "../assets/images/junctionX.png";
 
 export default function Home() {
+  const isMobile = window.innerWidth < 900;
+
   return (
-    <div className="w-full mx-24 my-3 ml-40 md:ml-48">
+    <div
+      className={`w-full mx-24 my-3 ${isMobile ? "-ml-4" : "ml-40 md:ml-48"}`}
+    >
       <div className="flex w-full justify-end items-center mt-8">
         <button className="bg-primary text-background font-semibold text-sm py-1 px-5 rounded-md shadow-buttonShadowHost hover:bg-accent-light">
           Host a Hackathon

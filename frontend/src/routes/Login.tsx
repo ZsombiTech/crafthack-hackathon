@@ -5,6 +5,7 @@ import { loginFields } from "../assets/helpers/formFields";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserProfile } from "../redux/actions/userAction";
 import { Link } from "react-router-dom";
+import { login } from "../api/user";
 
 const fields = loginFields;
 let fieldsState: any = {};
@@ -18,9 +19,13 @@ export default function Login() {
     setLoginState({ ...loginState, [e.target.id]: e.target.value });
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!loginState.email || !loginState.password)
       return alert("Please fill all the fields");
+
+    const response = await login(loginState.email, loginState.password);
+
+    console.log(response);
   };
 
   return (

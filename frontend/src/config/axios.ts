@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL:
+    "https://crafthack-hackathon-backend-git-dev-hackathon-web3.vercel.app",
   timeout: 1000,
 });
 

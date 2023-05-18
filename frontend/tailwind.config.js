@@ -10,9 +10,6 @@ module.exports = {
       secondary: "#D1C4E9",
       background: "#F3F3F3",
     },
-    screens: {
-      "3xl": "1900px",
-    },
     extend: {
       boxShadow: {
         buttonShadowHost: "0px 0px 10px #673AB7",
