@@ -1,0 +1,7 @@
+export DB_URL="postgres://postgres:868KAX3Qj4PY5S6f@db.emycqfkupcpfjtdusmkm.supabase.co:5432/postgres"
+
+export SUPABASE_URL="https://emycqfkupcpfjtdusmkm.supabase.co"
+export SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVteWNxZmt1cGNwZmp0ZHVzbWttIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDM5NDMzNCwiZXhwIjoxOTk5OTcwMzM0fQ.K6gIxQFOvDSKX6LkYJ2LolmA54wEiDSfVyum6fm7zwk"
+
+export JWT_SECRET="ZCAxepikAhQJHPPvtyMq6n2mOq7VDGPQHWCsuHu53uICPUdz6Hlkvupjfgd2Pj4_jGCZsbtnSemUWjJYX8pe9A"
+export JWT_ISSUER="crafthack-hackathon.vercel.app"
