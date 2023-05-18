@@ -7,7 +7,8 @@ const instance = axios.create({
 
 const cookies = document.cookie;
 const token = cookies.split(";").find((item) => {
-  return item.includes("token");
+  const key = item.split("=")[0];
+  return key.trim() === "token";
 });
 
 if (token) {

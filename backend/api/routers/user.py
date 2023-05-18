@@ -20,12 +20,12 @@ async def user_me_get(
     auth: Auth,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     try:
         user = await auth.get_user()
     except User.DoesNotExist:
-        return HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     return {
         "id": user.id,
@@ -42,12 +42,12 @@ async def user_get(
     user_id: str,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     try:
         user = await User.get_by_id(user_id)
     except User.DoesNotExist:
-        return HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     return {
         "id": user.id,
@@ -63,7 +63,7 @@ async def users_all_get(
     auth: Auth,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     users = await User.filter()
 
@@ -89,7 +89,7 @@ async def _user_patch(
     if email is not None:
         email = email.lower()
         if len(await User.filter(email = email)) > 0:
-            return HTTPException(
+            raise HTTPException(
                 status.HTTP_400_BAD_REQUEST, 
                 "Email already used."
             )
@@ -123,16 +123,16 @@ async def user_me_patch(
     body: UserPatch,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     if body.staff is not None:
         if not auth.is_staff():
-            return HTTPException(status.HTTP_401_UNAUTHORIZED)
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     try:
         user = await auth.get_user()
     except User.DoesNotExist:
-        return HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     await _user_patch(user, body.email, body.password, body.name)
 
@@ -144,19 +144,19 @@ async def user_patch(
     body: UserPatch,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     if not auth.is_staff() and auth.user_id != user_id:
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
     
     if body.staff is not None:
         if not auth.is_staff():
-            return HTTPException(status.HTTP_401_UNAUTHORIZED)
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
     
     try:
         user = await User.get_by_id(user_id)
     except User.DoesNotExist:
-        return HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     await _user_patch(auth, user, body.email, 
                       body.password, body.name, body.staff)
@@ -179,7 +179,7 @@ async def user_me_participations_get(
     auth: Auth,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     return await _get_participations(auth.user_id)
 
@@ -190,10 +190,10 @@ async def user_participations_get(
     user_id: int,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     if not auth.is_staff() and auth.user_id != user_id:
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
     
     return await _get_participations(user_id)
 
@@ -235,7 +235,7 @@ async def user_me_participation_post(
     body: UserParticipatePost,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     await _join_event(
         auth.user_id,
@@ -254,10 +254,10 @@ async def user_participation_post(
     body: UserParticipatePost,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     if not auth.is_staff() and auth.user_id != user_id:
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
     
     await _join_event(
         user_id,

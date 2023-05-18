@@ -6,9 +6,9 @@ from api.models import Permissions, User
 def authenticate_request(request: Request):
     try:
         token = request.headers["Authorization"].split(" ")[1]
-        #token = request.cookies["token"]
-        return User.authenticate_token(token)
-    except KeyError:
+        perms = User.authenticate_token(token)
+        return perms
+    except:
         return Permissions()
     
 Auth = Annotated[Permissions, Depends(authenticate_request)]
