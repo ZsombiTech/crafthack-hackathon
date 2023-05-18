@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Request, Response, HTTPException, status
 from fastapi.responses import ORJSONResponse
 
-from api.models import User
+from pydantic import BaseModel
+
+from api.models import User, Participation, Event
 from api.dependencies import Auth
 
 import time
@@ -9,7 +11,7 @@ import time
 
 router = APIRouter(
     default_response_class = ORJSONResponse,
-    tags = ["user"],
+    tags = ["users"],
 )
 
 
@@ -56,6 +58,27 @@ async def user_get(
     }
 
 
+@router.get("/")
+async def users_all_get(
+    auth: Auth,
+):
+    if not auth.is_authenticated():
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    users = await User.filter()
+
+    return [
+        {
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,
+            "staff": user.staff,
+            "last_modified": user.last_modified,
+        }
+        for user in users
+    ]
+
+
 async def _user_patch(
     user: User,
     email: str = None,
@@ -66,7 +89,10 @@ async def _user_patch(
     if email is not None:
         email = email.lower()
         if len(await User.filter(email = email)) > 0:
-            return HTTPException(status.HTTP_400_BAD_REQUEST, "Email already used.")
+            return HTTPException(
+                status.HTTP_400_BAD_REQUEST, 
+                "Email already used."
+            )
         user.email = email
         user.last_modified = int(time.time())
 
@@ -84,18 +110,22 @@ async def _user_patch(
     await user.save()
 
 
+class UserPatch(BaseModel):
+    email: str = None
+    password: str = None
+    name: str = None
+    staff: bool = None
+
+
 @router.patch("/me")
 async def user_me_patch(
     auth: Auth,
-    email: str = None,
-    password: str = None,
-    name: str = None,
-    staff: bool = None,
+    body: UserPatch,
 ):
     if not auth.is_authenticated():
         return HTTPException(status.HTTP_401_UNAUTHORIZED)
 
-    if staff is not None:
+    if body.staff is not None:
         if not auth.is_staff():
             return HTTPException(status.HTTP_401_UNAUTHORIZED)
 
@@ -104,17 +134,14 @@ async def user_me_patch(
     except User.DoesNotExist:
         return HTTPException(status.HTTP_404_NOT_FOUND)
 
-    await _user_patch(user, email, password, name)
+    await _user_patch(user, body.email, body.password, body.name)
 
 
 @router.patch("/{user_id}")
 async def user_patch(
     auth: Auth,
     user_id: str,
-    email: str = None,
-    password: str = None,
-    name: str = None,
-    staff: bool = None,
+    body: UserPatch,
 ):
     if not auth.is_authenticated():
         return HTTPException(status.HTTP_401_UNAUTHORIZED)
@@ -122,7 +149,7 @@ async def user_patch(
     if not auth.is_staff() and auth.user_id != user_id:
         return HTTPException(status.HTTP_401_UNAUTHORIZED)
     
-    if staff is not None:
+    if body.staff is not None:
         if not auth.is_staff():
             return HTTPException(status.HTTP_401_UNAUTHORIZED)
     
@@ -131,4 +158,113 @@ async def user_patch(
     except User.DoesNotExist:
         return HTTPException(status.HTTP_404_NOT_FOUND)
 
-    await _user_patch(auth, user, email, password, name, staff)
+    await _user_patch(auth, user, body.email, 
+                      body.password, body.name, body.staff)
+
+
+async def _get_participations(
+    user_id: int
+):
+    participations = await Participation.filter(user = user_id)
+    return [
+        {
+            "id": participation.id
+        }
+        for participation in participations
+    ]
+
+
+@router.get("/me/participation")
+async def user_me_participations_get(
+    auth: Auth,
+):
+    if not auth.is_authenticated():
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    return await _get_participations(auth.user_id)
+
+
+@router.get("/{user_id}/participation")
+async def user_participations_get(
+    auth: Auth,
+    user_id: int,
+):
+    if not auth.is_authenticated():
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if not auth.is_staff() and auth.user_id != user_id:
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+    
+    return await _get_participations(user_id)
+
+
+async def _join_event(
+    user_id: int,
+    event_id: int,
+    format: str,
+    needs_teammates: bool,
+    description: str,
+):
+    # check if event exists
+    try:
+        event = await Event.get_by_id(event_id)
+    except Event.DoesNotExist:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    participation = Participation(
+        user = user_id,
+        event = event_id,
+        format = format,
+        needs_teammates = needs_teammates,
+        description = description,
+    )
+    await participation.save()
+
+
+class UserParticipatePost(BaseModel):
+    event_id: int
+    format: str
+    needs_teammates: bool = False
+    description: str = None
+
+
+@router.post("/me/participation/{event_id}")
+async def user_me_participation_post(
+    auth: Auth,
+    event_id: int,
+    body: UserParticipatePost,
+):
+    if not auth.is_authenticated():
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    await _join_event(
+        auth.user_id,
+        event_id,
+        body.format,
+        body.needs_teammates,
+        body.description,
+    )
+
+
+@router.post("/{user_id}/participation/{event_id}")
+async def user_participation_post(
+    auth: Auth,
+    user_id: int,
+    event_id: int,
+    body: UserParticipatePost,
+):
+    if not auth.is_authenticated():
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+    if not auth.is_staff() and auth.user_id != user_id:
+        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+    
+    await _join_event(
+        user_id,
+        event_id,
+        body.format,
+        body.needs_teammates,
+        body.description,
+    )
+
+

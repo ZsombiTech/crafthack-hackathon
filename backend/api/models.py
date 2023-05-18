@@ -4,7 +4,6 @@ Async PostgreSQL ORM and models.
 
 from api.config import Config
 
-import peewee
 from peewee_aio import Manager, AIOModel, fields
 manager = Manager(
     url = Config.db_url,
@@ -122,3 +121,38 @@ class User(AIOModel):
             return bcrypt.checkpw(plain.encode("utf8"), self.password.encode("utf8"))
         except:
             return False
+
+
+@manager.register
+class Event(AIOModel):
+    id = fields.AutoField()
+    title = fields.CharField()
+    start_time = fields.IntegerField()
+    end_time = fields.IntegerField()
+    format = fields.CharField() # hybrid or online
+    prize = fields.IntegerField()
+    participants = fields.IntegerField()
+    thumbnail = fields.CharField()
+    description = fields.TextField()
+
+    class Meta:
+        table_name = "events"
+
+
+@manager.register
+class Participation(AIOModel):
+    id = fields.AutoField()
+    user = fields.ForeignKeyField(User)
+    event = fields.ForeignKeyField(Event)
+    format = fields.CharField() # offline or online
+    confirmed = fields.BooleanField(default = False)
+    tax_number = fields.CharField()
+
+    needs_teammates = fields.BooleanField(default = False)
+    description = fields.TextField()
+
+    class Meta:
+        table_name = "participations"
+        indexes = (
+            (("user", "event"), True),
+        )
