@@ -6,17 +6,19 @@ import Error from "./routes/Error";
 import Navbar from "./components/Navbar";
 import { Provider } from "react-redux";
 import store from "./redux/store";
+import Home from "./routes/Home";
+import Sidebar from "./components/Sidebar";
+import Attendees from "./routes/Attendees";
+import Settings from "./routes/Settings";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <>
-        <div className="invisible">
-          <Navbar />
-        </div>
-        <Login />
-      </>
+      <div className="flex">
+        <Sidebar />
+        <Home />
+      </div>
     ),
     errorElement: <Error />,
   },
@@ -40,6 +42,24 @@ const router = createBrowserRouter([
         </div>
         <Register />
       </>
+    ),
+  },
+  {
+    path: "/attendees",
+    element: (
+      <div className="flex">
+        <Sidebar />
+        <Attendees />
+      </div>
+    ),
+  },
+  {
+    path: "/settings",
+    element: (
+      <div className="flex">
+        <Sidebar />
+        <Settings />
+      </div>
     ),
   },
 ]);

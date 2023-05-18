@@ -15,6 +15,20 @@ export default function Register() {
     setRegisterState({ ...registerState, [e.target.id]: e.target.value });
   };
 
+  const handleRegister = () => {
+    console.log(registerState);
+    if (
+      !registerState.fullname ||
+      !registerState.email ||
+      !registerState.password ||
+      !registerState.confirmpassword
+    )
+      return alert("Please fill all the fields");
+
+    if (registerState.password !== registerState.confirmPassword)
+      return alert("Passwords do not match");
+  };
+
   return (
     <div className="w-full flex justify-center items-center">
       <div className="flex flex-col rounded-lg px-6 md:px-16 py-5 m-4 bg-dark-lightest w-full md:w-1/3">
@@ -37,7 +51,10 @@ export default function Register() {
         </form>
         <div className="flex justify-center items-center mt-4">
           <div className="flex justify-center items-center flex-col">
-            <button className="bg-accent px-4 py-2 rounded-lg text-white font-semibold w-28">
+            <button
+              className="bg-accent px-4 py-2 rounded-lg text-white font-semibold w-28"
+              onClick={handleRegister}
+            >
               Register
             </button>
             <Link to="/login" className="text-secondary font-bold text-sm mt-1">

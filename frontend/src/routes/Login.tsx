@@ -13,19 +13,14 @@ fields.forEach((field) => (fieldsState[field.id] = ""));
 export default function Login() {
   const dispatch = useDispatch();
   const [loginState, setLoginState] = useState(fieldsState);
-  const state = useSelector((state) => state);
-  useEffect(() => {
-    dispatch(
-      setUserProfile({
-        name: "John Doe",
-        email: "wefwe",
-        password: "wefwef",
-      })
-    );
-  }, []);
 
   const handleChange = (e: any) => {
     setLoginState({ ...loginState, [e.target.id]: e.target.value });
+  };
+
+  const handleLogin = () => {
+    if (!loginState.email || !loginState.password)
+      return alert("Please fill all the fields");
   };
 
   return (
@@ -50,7 +45,10 @@ export default function Login() {
         </form>
         <div className="flex justify-center items-center mt-4">
           <div className="flex justify-center items-center flex-col">
-            <button className="bg-accent px-4 py-2 rounded-lg text-white font-semibold w-28">
+            <button
+              className="bg-accent px-4 py-2 rounded-lg text-white font-semibold w-28"
+              onClick={handleLogin}
+            >
               Login
             </button>
             <Link
