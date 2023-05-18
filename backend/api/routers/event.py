@@ -3,7 +3,7 @@ from fastapi.responses import ORJSONResponse
 
 from pydantic import BaseModel
 
-from api.models import Event, User
+from api.models import Event, User, Participation
 from api.dependencies import Auth
 
 
@@ -46,6 +46,10 @@ async def event_get(
     except Event.DoesNotExist:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
+    event = await Event.get_by_id(event_id)
+
+    attendees = await Participation.select().where(Participation.event == event)
+
     return {
         "id": event.id,
         "title": event.title,
@@ -55,6 +59,7 @@ async def event_get(
         "end_time": event.end_time,
         "format": event.format,
         "prize": event.prize,
+        "attendees": attendees
     }
 
 
