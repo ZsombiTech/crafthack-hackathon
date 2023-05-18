@@ -35,3 +35,15 @@ export const getAllParticipantsForEvent = async (eventId: number) => {
     throw error;
   }
 };
+
+export const postParticipation = async (eventId: number, data: any) => {
+  try {
+    const response = await axios.post(
+      `/user/me/participation/${eventId}`,
+      data
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

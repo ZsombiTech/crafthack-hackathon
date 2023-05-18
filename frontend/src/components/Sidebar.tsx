@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setHackathon, setUserProfile } from "../redux/actions/userAction";
 import SettingIcon from "../assets/images/settings.svg";
 import SignOutLogo from "../assets/images/signOut.svg";
+import MagnifyIcon from "../assets/images/magnifyIcon.svg";
 
 const setCookie = (
   key: any,
@@ -155,6 +156,18 @@ export default function Sidebar() {
                   <img src={AttendeesIcon} alt="Menu" className="w-4" />
                   <p className="text-background font-semibold text-sm ml-2">
                     Attendees
+                  </p>
+                </Link>
+                <Link
+                  to="/tinder"
+                  className={`flex items-center mt-3 w-3/4 py-1.5 justify-start pl-2 md:pl-5 rounded-md hover:bg-accent ${
+                    location.pathname === "/tinder" ? "bg-accent" : ""
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <img src={MagnifyIcon} alt="Menu" className="w-4" />
+                  <p className="text-background font-semibold text-sm ml-2">
+                    Team Finder
                   </p>
                 </Link>
               </>

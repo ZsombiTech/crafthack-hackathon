@@ -13,6 +13,8 @@ import Settings from "./routes/Settings";
 import Dashboard from "./routes/Dashboard";
 import MobileSidebar from "./components/MobileSidebar";
 import Chat from "./routes/Chat";
+import Tinder from "./routes/Tinder";
+import Wrapper from "./components/Wrapper";
 
 const isMobile = window.innerWidth < 1270;
 
@@ -20,10 +22,10 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <div className="flex">
+      <Wrapper className="flex">
         {!isMobile ? <Sidebar /> : <MobileSidebar />}
         <Home />
-      </div>
+      </Wrapper>
     ),
     errorElement: <Error />,
   },
@@ -52,37 +54,46 @@ const router = createBrowserRouter([
   {
     path: "/attendees",
     element: (
-      <div className="flex">
+      <Wrapper className="flex">
         {!isMobile ? <Sidebar /> : <MobileSidebar />}
         <Attendees />
-      </div>
+      </Wrapper>
     ),
   },
   {
     path: "/settings",
     element: (
-      <div className="flex">
+      <Wrapper className="flex">
         {!isMobile ? <Sidebar /> : <MobileSidebar />}
         <Settings />
-      </div>
+      </Wrapper>
     ),
   },
   {
     path: "/dashboard",
     element: (
-      <div className="flex">
+      <Wrapper className="flex">
         {!isMobile ? <Sidebar /> : <MobileSidebar />}
         <Dashboard />
-      </div>
+      </Wrapper>
     ),
   },
   {
     path: "/chat",
     element: (
-      <div className="flex">
+      <Wrapper className="flex">
         {!isMobile ? <Sidebar /> : <MobileSidebar />}
         <Chat />
-      </div>
+      </Wrapper>
+    ),
+  },
+  {
+    path: "/tinder",
+    element: (
+      <Wrapper className="flex">
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
+        <Tinder />
+      </Wrapper>
     ),
   },
 ]);

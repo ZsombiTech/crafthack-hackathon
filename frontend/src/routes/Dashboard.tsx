@@ -1,9 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import RecommendationCard from "../components/RecommendationCard";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+  const navigation = useNavigate();
   const [enabled, setEnabled] = useState(false);
   const isMobile = window.innerWidth < 1270;
+  const hackathon = useSelector((state: any) => state.hackathon);
+
+  useEffect(() => {
+    if (!hackathon) {
+      navigation("/");
+    }
+  }, []);
+
   return (
     <div className={`w-full ${isMobile ? "ml-0" : "ml-40 md:ml-48"}`}>
       <h1 className="text-3xl text-center font-semibold mt-10">

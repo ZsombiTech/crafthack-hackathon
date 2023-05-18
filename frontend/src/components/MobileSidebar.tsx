@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import MenuIcon from "../assets/images/menuIcon.svg";
 import AttendeesIcon from "../assets/images/attendeesIcon.svg";
 import { useSelector } from "react-redux";
+import MagnifyIcon from "../assets/images/magnifyIcon.svg";
 
 export default function MobileSidebar() {
   const location = useLocation();
@@ -23,7 +24,7 @@ export default function MobileSidebar() {
           </p>{" "}
         </Link>
       ) : (
-        <>
+        <div className="flex items-center w-11/12">
           <Link
             to="/dashboard"
             className={`flex items-center mt-3 justify-start py-1.5 px-3 rounded-md hover:bg-accent ${
@@ -46,7 +47,18 @@ export default function MobileSidebar() {
               Attendees
             </p>
           </Link>
-        </>
+          <Link
+            to="/tinder"
+            className={`shrink-0 flex items-center mt-3 justify-start py-1.5 px-3 rounded-md hover:bg-accent ${
+              location.pathname === "/tinder" ? "bg-accent" : ""
+            }`}
+          >
+            <img src={MagnifyIcon} alt="Menu" className="w-4" />
+            <p className="text-background font-semibold text-sm ml-2">
+              Team Finders
+            </p>
+          </Link>
+        </div>
       )}
     </div>
   );

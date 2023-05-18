@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { ChatComp } from "../components/Message";
 import { getChat, postChat } from "../api/chat";
 import { useNavigate } from "react-router-dom";
+import { postParticipation } from "../api/event";
+import { useSelector } from "react-redux";
 
 interface Message {
   message: string;
@@ -15,6 +17,7 @@ export default function Chat() {
   const messagesContainer = useRef<HTMLDivElement>(null);
   const isMobile = window.innerWidth < 1270;
   const [waiting, setWaiting] = useState<boolean>(false);
+  const hackathon = useSelector((state: any) => state.hackathon);
 
   useEffect(() => {
     if (messagesContainer.current) {
@@ -26,6 +29,9 @@ export default function Chat() {
   }, [currentMessages]);
 
   useEffect(() => {
+    if (!hackathon) {
+      navigation("/");
+    }
     const getMessages = async () => {
       const messages = await getChat();
       const currentMessage = {
@@ -48,9 +54,15 @@ export default function Chat() {
     messagess.push(messageSend);
     const { data } = await postChat(message);
     if (data.message.includes("<END_CONVERSATION>")) {
+      await postParticipation(hackathon.id, {
+        event_id: hackathon.id,
+        format: "offline",
+        needs_teammates: true,
+        description: "I need teammates",
+      });
       setTimeout(() => {
         navigation("/dashboard");
-      }, 3000);
+      }, 2000);
     }
     const currentMessage = {
       message: data.message,

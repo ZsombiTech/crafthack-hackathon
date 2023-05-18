@@ -48,9 +48,6 @@ const getAllEventsAPI = async (
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const dispatch = useDispatch();
   const userProfile = useSelector((state: any) => state.userProfile);
   const isMobile = window.innerWidth < 1270;
   const [eventName, setEventName] = useState("");
@@ -67,32 +64,6 @@ export default function Home() {
   function closeModal() {
     setIsOpen(false);
   }
-
-  useEffect(() => {
-    if (!userProfile) {
-      getUserProfile()
-        .then((response) => {
-          if (response.data.email) {
-            dispatch(setUserProfile(response.data));
-          } else {
-            dispatch(setUserProfile(null));
-            if (
-              location.pathname !== "/login" &&
-              location.pathname !== "/register"
-            )
-              navigate("/login");
-          }
-        })
-        .catch((error) => {
-          dispatch(setUserProfile(null));
-          if (
-            location.pathname !== "/login" &&
-            location.pathname !== "/register"
-          )
-            navigate("/login");
-        });
-    }
-  }, [dispatch, location.pathname, navigate, userProfile]);
 
   useEffect(() => {
     setLoading2(true);

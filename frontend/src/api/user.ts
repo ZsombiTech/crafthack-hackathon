@@ -37,3 +37,12 @@ export const getUserProfile = async () => {
     throw error;
   }
 };
+
+export const getByUserId = async (userId: string) => {
+  try {
+    const response = await axios.get(`/user/${userId}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

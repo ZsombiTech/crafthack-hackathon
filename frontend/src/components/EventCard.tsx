@@ -61,9 +61,19 @@ export default function EventCard({
   const timeLeft = calculateTimeLeft(endTime);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChooseHackathon = async (hackathon: string) => {
+  const handleChooseHackathon = async () => {
     setIsLoading(true);
-    dispatch(setHackathon(hackathon));
+    dispatch(
+      setHackathon({
+        id,
+        name,
+        format,
+        prize,
+        participants,
+        startTime,
+        endTime,
+      })
+    );
     const { data } = await getAllParticipations();
     setIsLoading(false);
     if (data.length === 0) {
@@ -90,7 +100,7 @@ export default function EventCard({
           !isMobile && "bg-dark-lightest border-primary border-2"
         }`}
         onClick={() => {
-          handleChooseHackathon(name);
+          handleChooseHackathon();
         }}
       >
         <img src={img} alt="Event" className="w-64" />
