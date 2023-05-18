@@ -12,6 +12,7 @@ fields.forEach((field) => (fieldsState[field.id] = ""));
 export default function Login() {
   const navigate = useNavigate();
   const [loginState, setLoginState] = useState(fieldsState);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const cookies = document.cookie;
@@ -30,10 +31,13 @@ export default function Login() {
     if (!loginState.email || !loginState.password)
       return alert("Please fill all the fields");
 
+    setIsLoading(true);
     const response = await login(loginState.email, loginState.password);
 
     document.cookie = `token=${response.data.token}`;
     navigate("/");
+    setIsLoading(false);
+    window.location.reload();
   };
 
   return (
@@ -58,12 +62,19 @@ export default function Login() {
         </form>
         <div className="flex justify-center items-center mt-4">
           <div className="flex justify-center items-center flex-col">
-            <button
-              className="bg-accent px-4 py-2 rounded-lg text-white font-semibold w-28"
-              onClick={handleLogin}
-            >
-              Login
-            </button>
+            {isLoading ? (
+              <div className="flex justify-center items-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              </div>
+            ) : (
+              <button
+                className="bg-accent px-4 py-2 rounded-lg text-white font-semibold w-28"
+                onClick={handleLogin}
+              >
+                Login
+              </button>
+            )}
+
             <Link
               to="/register"
               className="text-secondary font-bold text-sm mt-1"

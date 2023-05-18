@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ChatComp } from "../components/Message";
+import { getChat, postChat } from "../api/chat";
 
 interface Message {
   message: string;
@@ -21,12 +22,21 @@ export default function Chat() {
     }
   }, [currentMessages]);
 
-  const handleSendMessage = () => {
+  useEffect(() => {
+    const getMessages = async () => {
+      const messages = await getChat();
+      console.log(messages);
+    };
+    getMessages();
+  }, []);
+
+  const handleSendMessage = async () => {
     const messageSend = {
       message,
       isFromUser: true,
     };
     setCurrentMessages([...currentMessages, messageSend]);
+    await postChat(message);
   };
 
   return (

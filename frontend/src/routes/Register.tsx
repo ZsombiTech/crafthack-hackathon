@@ -12,6 +12,7 @@ fields.forEach((field) => (fieldsState[field.id] = ""));
 export default function Register() {
   const navigate = useNavigate();
   const [registerState, setRegisterState] = useState(fieldsState);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: any) => {
     setRegisterState({ ...registerState, [e.target.id]: e.target.value });
@@ -29,6 +30,8 @@ export default function Register() {
     if (registerState.password !== registerState.confirmpassword)
       return alert("Passwords do not match");
 
+    setIsLoading(true);
+
     const response = await register(
       registerState.fullname,
       registerState.email,
@@ -37,6 +40,7 @@ export default function Register() {
 
     document.cookie = `token=${response.data.token}`;
     navigate("/");
+    setIsLoading(false);
     window.location.reload();
   };
 
@@ -62,12 +66,18 @@ export default function Register() {
         </form>
         <div className="flex justify-center items-center mt-4">
           <div className="flex justify-center items-center flex-col">
-            <button
-              className="bg-accent px-4 py-2 rounded-lg text-white font-semibold w-28"
-              onClick={handleRegister}
-            >
-              Register
-            </button>
+            {isLoading ? (
+              <div className="flex justify-center items-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              </div>
+            ) : (
+              <button
+                className="bg-accent px-4 py-2 rounded-lg text-white font-semibold w-28"
+                onClick={handleRegister}
+              >
+                Register
+              </button>
+            )}
             <Link to="/login" className="text-secondary font-bold text-sm mt-1">
               Or login to account
             </Link>

@@ -15,47 +15,30 @@ interface EventCardProps {
   isUpcoming: boolean;
 }
 
-const calculateTimeLeftFromToday = (startTime: number, endTime: number) => {
-  const today = new Date();
-  const start = new Date(startTime * 1000);
-  const end = new Date(endTime * 1000);
-  const timeLeft = {
-    days: 0,
-    months: 0,
-  };
-  if (today.getMonth() === start.getMonth()) {
-    timeLeft.days = end.getDate() - today.getDate();
-  } else {
-    timeLeft.days = end.getDate() + (start.getDate() - today.getDate());
-    timeLeft.months = end.getMonth() - today.getMonth();
-  }
+const calculateTimeLeftFromToday = (startTime: number) => {
+  const currentDate = new Date();
+  const targetDate = new Date(startTime * 1000);
 
-  return timeLeft;
+  const timeDiff = targetDate.getTime() - currentDate.getTime();
+  const months = Math.floor(timeDiff / (30 * 24 * 60 * 60 * 1000));
+  const days = Math.floor((timeDiff / (24 * 60 * 60 * 1000)) % 30);
+
+  return { months, days };
 };
 
-const calculateTimeLeft = (startTime: number, endTime: number) => {
-  const today = new Date();
-  const start = new Date(startTime * 1000);
-  const end = new Date(endTime * 1000);
-  const timeLeft = {
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
+const calculateTimeLeft = (endTime: number) => {
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+  const timeDifference = currentTimestamp - endTime;
+
+  const hours = Math.floor(timeDifference / 3600);
+  const minutes = Math.floor((timeDifference % 3600) / 60);
+  const seconds = timeDifference % 60;
+
+  return {
+    hours,
+    minutes,
+    seconds,
   };
-
-  if (today.getMonth() === start.getMonth()) {
-    timeLeft.hours = end.getHours() - today.getHours();
-    timeLeft.minutes = end.getMinutes() - today.getMinutes();
-    timeLeft.seconds = end.getSeconds() - today.getSeconds();
-  } else {
-    timeLeft.hours = end.getHours() + (start.getHours() - today.getHours());
-    timeLeft.minutes =
-      end.getMinutes() + (start.getMinutes() - today.getMinutes());
-    timeLeft.seconds =
-      end.getSeconds() + (start.getSeconds() - today.getSeconds());
-  }
-
-  return timeLeft;
 };
 
 export default function EventCard({
@@ -71,14 +54,14 @@ export default function EventCard({
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isMobile = window.innerWidth < 1270;
-  const timeLeftMonth = calculateTimeLeftFromToday(startTime, endTime);
-  const timeLeft = calculateTimeLeft(startTime, endTime);
+  const timeLeftMonth = calculateTimeLeftFromToday(startTime);
+  const timeLeft = calculateTimeLeft(endTime);
 
   const handleChooseHackathon = async (hackathon: string) => {
-    const response = await getAllParticipations();
-    console.log(response);
+    /*const response = await getAllParticipations();
+    console.log(response);*/
     dispatch(setHackathon(hackathon));
-    navigate("/dashboard");
+    navigate("/chat");
   };
 
   return (
@@ -120,7 +103,7 @@ export default function EventCard({
                   {timeLeftMonth.days}
                 </p>
                 <p className="ml-3 font-semibold text-background text-xl">
-                  daus
+                  days
                 </p>
               </div>
             </>

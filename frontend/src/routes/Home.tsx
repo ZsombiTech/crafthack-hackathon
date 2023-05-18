@@ -1,7 +1,5 @@
 import React, { useEffect, useState, Fragment } from "react";
 import EventCard from "../components/EventCard";
-import CraftHack from "../assets/images/craftHack.png";
-import JunctionX from "../assets/images/junctionX.png";
 import { getUserProfile } from "../api/user";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserProfile } from "../redux/actions/userAction";
@@ -21,6 +19,8 @@ interface Event {
 }
 
 const getAllEventsAPI = async (setEvents: any, setUpComingEvents: any) => {
+  const events: any[] = [];
+  const upComingEvents: any[] = [];
   getAllEvents()
     .then(({ data }) => {
       const currentDate = new Date();
@@ -29,11 +29,13 @@ const getAllEventsAPI = async (setEvents: any, setUpComingEvents: any) => {
         const endDate = new Date(event.end_time * 1000);
         endDate.setDate(endDate.getDate() + 1);
         if (startDate <= currentDate && endDate >= currentDate) {
-          setEvents((prev: any) => [...prev, event]);
+          events.push(event);
         } else if (startDate > currentDate) {
-          setUpComingEvents((prev: any) => [...prev, event]);
+          upComingEvents.push(event);
         }
       });
+      setEvents(events);
+      setUpComingEvents(upComingEvents);
     })
     .catch((error) => console.log(error));
 };
@@ -89,6 +91,7 @@ export default function Home() {
     const callAPI = async () => {
       await getAllEventsAPI(setEvents, setUpComingEvents);
     };
+
     callAPI();
   }, []);
 
