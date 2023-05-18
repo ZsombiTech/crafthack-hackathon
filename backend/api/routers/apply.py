@@ -18,6 +18,8 @@ router = APIRouter(
 
 @router.get("/")
 async def start_conservation(auth: Auth):
+    uid = 1
+
     if not auth.is_authenticated():
         uid = 1
         #raise HTTPException(status.HTTP_401_UNAUTHORIZED)
@@ -49,6 +51,7 @@ async def continue_conservation(
     auth: Auth,
     body: ApplyPost,
 ):
+    uid = 1
     if not auth.is_authenticated():
         uid = 1
         #raise HTTPException(status.HTTP_401_UNAUTHORIZED)
