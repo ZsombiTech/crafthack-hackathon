@@ -49,7 +49,7 @@ class User(AIOModel):
         table_name = "users"
 
     @classmethod
-    async def issue_token(cls, user_id: str, expiration: int = 600):
+    async def issue_token(cls, user_id: str, expiration: int = 3600):
         user: User = await cls.get_by_id(user_id)
         scopes: list[str] = []
 
@@ -82,7 +82,7 @@ class User(AIOModel):
             return Permissions()
 
     @classmethod
-    async def reissue_token(cls, token: str, expiration: int = 600):
+    async def reissue_token(cls, token: str, expiration: int = 3600):
         try:
             # throws if invalid, but not when expired
             claims: dict = jwt.decode(

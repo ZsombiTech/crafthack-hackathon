@@ -18,7 +18,7 @@ async def events_all_get(
     auth: Auth,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     events = await Event.filter()
     return [{
@@ -39,12 +39,12 @@ async def event_get(
     event_id: int,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     try:
         event = await Event.get_by_id(event_id)
     except Event.DoesNotExist:
-        return HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     return {
         "id": event.id,
@@ -74,10 +74,10 @@ async def event_post(
     body: EventPost,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
     
     if not auth.is_staff():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     event = Event(
         title = body.title,
@@ -108,15 +108,15 @@ async def event_patch(
     body: EventPost
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
     
     if not auth.is_staff():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     try:
         event = await Event.get_by_id(event_id)
     except Event.DoesNotExist:
-        return HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     if body.title:
         event.title = body.title
@@ -148,14 +148,14 @@ async def event_delete(
     event_id: int,
 ):
     if not auth.is_authenticated():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
     
     if not auth.is_staff():
-        return HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     try:
         event = await Event.get_by_id(event_id)
     except Event.DoesNotExist:
-        return HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     await event.delete()
