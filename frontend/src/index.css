@@ -3,5 +3,17 @@
 @tailwind utilities;
 
 body {
-  background-color: #1f2937;
+  background-color: #262536;
+  color: white;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.eventcontainerscroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.eventcontainerscroll {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

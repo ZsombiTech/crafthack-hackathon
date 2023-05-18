@@ -1,32 +1,18 @@
-import { Link } from "react-router-dom";
+import LogoLogin from "../assets/images/logoLogin.svg";
 
 interface HeaderProps {
   heading: string;
-  paragraph: string;
-  linkName: string;
-  linkUrl?: string;
 }
 
-export default function Header({
-  heading,
-  paragraph,
-  linkName,
-  linkUrl = "#",
-}: HeaderProps) {
+export default function Header({ heading }: HeaderProps) {
   return (
     <div className="mb-3">
-      <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-        {heading}
-      </h2>
-      <p className="mt-2 text-center text-sm text-white mt-5">
-        {paragraph}
-        <Link
-          to={linkUrl}
-          className="ml-3 font-medium text-blue-600 hover:text-blue-500"
-        >
-          {linkName}
-        </Link>
-      </p>
+      <img src={LogoLogin} alt="Logo" className="w-36 mx-auto" />
+      <div className="w-3/4 mx-auto mt-2">
+        <h2 className="font-semibold mt-6 text-center text-xl text-white">
+          {heading}
+        </h2>
+      </div>
     </div>
   );
 }
