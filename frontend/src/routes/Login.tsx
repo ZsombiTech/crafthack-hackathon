@@ -70,6 +70,11 @@ export default function Login() {
               <button
                 className="bg-accent px-4 py-2 rounded-lg text-white font-semibold w-28"
                 onClick={handleLogin}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleLogin();
+                  }
+                }}
               >
                 Login
               </button>

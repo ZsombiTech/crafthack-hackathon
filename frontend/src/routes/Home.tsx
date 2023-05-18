@@ -6,6 +6,7 @@ import { setUserProfile } from "../redux/actions/userAction";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { createEvent, getAllEvents } from "../api/event";
 import { Dialog, Transition } from "@headlessui/react";
+import LoadingFullPage from "../components/LoadingFullPage";
 
 interface Event {
   title: string;
@@ -18,7 +19,11 @@ interface Event {
   id: number;
 }
 
-const getAllEventsAPI = async (setEvents: any, setUpComingEvents: any) => {
+const getAllEventsAPI = async (
+  setEvents: any,
+  setUpComingEvents: any,
+  setLoading: any
+) => {
   const events: any[] = [];
   const upComingEvents: any[] = [];
   getAllEvents()
@@ -34,6 +39,7 @@ const getAllEventsAPI = async (setEvents: any, setUpComingEvents: any) => {
           upComingEvents.push(event);
         }
       });
+      setLoading(false);
       setEvents(events);
       setUpComingEvents(upComingEvents);
     })
@@ -56,6 +62,7 @@ export default function Home() {
   const [eventPrize, setEventPrize] = useState("");
   const [events, setEvents] = useState<Event[]>([]);
   const [upComingEvents, setUpComingEvents] = useState<Event[]>([]);
+  const [loading2, setLoading2] = useState(false);
 
   function closeModal() {
     setIsOpen(false);
@@ -88,8 +95,9 @@ export default function Home() {
   }, [dispatch, location.pathname, navigate, userProfile]);
 
   useEffect(() => {
+    setLoading2(true);
     const callAPI = async () => {
-      await getAllEventsAPI(setEvents, setUpComingEvents);
+      await getAllEventsAPI(setEvents, setUpComingEvents, setLoading2);
     };
 
     callAPI();
@@ -107,12 +115,13 @@ export default function Home() {
       format: eventFormat,
       prize: eventPrize,
     });
-    await getAllEventsAPI(setEvents, setUpComingEvents);
+    await getAllEventsAPI(setEvents, setUpComingEvents, setLoading2);
     closeModal();
   };
 
   return (
     <>
+      {loading2 && <LoadingFullPage />}
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
           <Transition.Child
@@ -253,12 +262,12 @@ export default function Home() {
           >
             Host a Hackathon
           </button>
-          <Link
-            to="/chat"
-            className="bg-accent text-background font-semibold text-sm py-1 px-5 rounded-md shadow-buttonShadowJoin hover:bg-accent-light ml-4"
+          <button
+            disabled={true}
+            className="bg-accent opacity-20 text-background font-semibold text-sm py-1 px-5 rounded-md shadow-buttonShadowJoin hover:bg-accent-light ml-4"
           >
             Join a hackathon
-          </Link>
+          </button>
         </div>
         <div className="ml-2 lg:ml-24 mt-8 3xl:mt-16">
           <h1 className="text-background text-3xl font-semibold">Ongoing</h1>
@@ -274,6 +283,7 @@ export default function Home() {
                 startTime={event.start_time}
                 endTime={event.end_time}
                 isUpcoming={false}
+                id={event.id}
               />
             ))}
             {events.length === 0 && (
@@ -303,6 +313,7 @@ export default function Home() {
                 startTime={event.start_time}
                 endTime={event.end_time}
                 isUpcoming={true}
+                id={event.id}
               />
             ))}
           </div>

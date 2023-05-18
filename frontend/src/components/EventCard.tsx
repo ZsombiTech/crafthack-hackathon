@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { setHackathon } from "../redux/actions/userAction";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAllParticipations } from "../api/event";
+import LoadingFullPage from "./LoadingFullPage";
 
 interface EventCardProps {
   img: string;
@@ -13,6 +14,7 @@ interface EventCardProps {
   startTime: number;
   endTime: number;
   isUpcoming: boolean;
+  id: number;
 }
 
 const calculateTimeLeftFromToday = (startTime: number) => {
@@ -50,93 +52,116 @@ export default function EventCard({
   startTime,
   endTime,
   isUpcoming,
+  id,
 }: EventCardProps) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isMobile = window.innerWidth < 1270;
   const timeLeftMonth = calculateTimeLeftFromToday(startTime);
   const timeLeft = calculateTimeLeft(endTime);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChooseHackathon = async (hackathon: string) => {
-    /*const response = await getAllParticipations();
-    console.log(response);*/
+    setIsLoading(true);
     dispatch(setHackathon(hackathon));
-    navigate("/chat");
+    const { data } = await getAllParticipations();
+    setIsLoading(false);
+    if (data.length === 0) {
+      navigate("/chat");
+      return;
+    } else {
+      console.log(data);
+      console.log(id);
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].id === id) {
+          navigate("/dashboard");
+          return;
+        }
+      }
+      navigate("/chat");
+      return;
+    }
   };
 
   return (
-    <div
-      className={`w-full flex items-center mt-4 p-6 rounded-lg ${
-        !isMobile && "bg-dark-lightest border-primary border-2"
-      }`}
-      onClick={() => handleChooseHackathon(name)}
-    >
-      <img src={img} alt="Event" className="w-64" />
-      <div className="flex flex-col justify-start items-center ml-8 shrink-0">
-        <div className="w-full">
-          <h1 className="text-background text-2xl font-semibold">{name}</h1>
-          <p className="text-background text-sm font-semibold">{format}</p>
+    <>
+      {isLoading && <LoadingFullPage />}
+
+      <div
+        className={`w-full flex items-center mt-4 p-6 rounded-lg ${
+          !isMobile && "bg-dark-lightest border-primary border-2"
+        }`}
+        onClick={() => {
+          handleChooseHackathon(name);
+        }}
+      >
+        <img src={img} alt="Event" className="w-64" />
+        <div className="flex flex-col justify-start items-center ml-8 shrink-0">
+          <div className="w-full">
+            <h1 className="text-background text-2xl font-semibold">{name}</h1>
+            <p className="text-background text-sm font-semibold">{format}</p>
+          </div>
+          <div className="mt-12 flex justify-start flex-col w-full">
+            <p className="text-background text-lg font-semibold text-start">
+              Up to {prize}
+            </p>
+            <p className="text-background text-lg font-semibold text-start">
+              {participants} participants
+            </p>
+          </div>
         </div>
-        <div className="mt-12 flex justify-start flex-col w-full">
-          <p className="text-background text-lg font-semibold text-start">
-            Up to {prize}
-          </p>
-          <p className="text-background text-lg font-semibold text-start">
-            {participants} participants
-          </p>
+        <div className="w-full flex justify-end items-center">
+          <div className="flex flex-col p-4 px-6 rounded-lg justify-start items-center ml-8 border-2 border-accent shadow-buttonShadowJoin">
+            {isUpcoming ? (
+              <>
+                <div className="flex items-center w-full">
+                  <p className="text-accent font-semibold text-5xl">
+                    {timeLeftMonth.months}
+                  </p>
+                  <p className="ml-3 font-semibold text-background text-xl">
+                    months
+                  </p>
+                </div>
+                <div className="flex items-center w-full">
+                  <p className="text-accent font-semibold text-5xl">
+                    {timeLeftMonth.days}
+                  </p>
+                  <p className="ml-3 font-semibold text-background text-xl">
+                    days
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center w-full">
+                  <p className="text-accent font-semibold text-5xl">
+                    {Math.abs(timeLeft.hours)}
+                  </p>
+                  <p className="ml-3 font-semibold text-background text-xl">
+                    hours
+                  </p>
+                </div>
+                <div className="flex items-center w-full">
+                  <p className="text-accent font-semibold text-5xl">
+                    {Math.abs(timeLeft.minutes)}
+                  </p>
+                  <p className="ml-3 font-semibold text-background text-xl">
+                    minutes
+                  </p>
+                </div>
+                <div className="flex items-center w-full">
+                  <p className="text-accent font-semibold text-5xl">
+                    {Math.abs(timeLeft.seconds)}
+                  </p>
+                  <p className="ml-3 font-semibold text-background text-xl">
+                    seconds
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
-      <div className="w-full flex justify-end items-center">
-        <div className="flex flex-col p-4 px-6 rounded-lg justify-start items-center ml-8 border-2 border-accent shadow-buttonShadowJoin">
-          {isUpcoming ? (
-            <>
-              <div className="flex items-center w-full">
-                <p className="text-accent font-semibold text-5xl">
-                  {timeLeftMonth.months}
-                </p>
-                <p className="ml-3 font-semibold text-background text-xl">
-                  months
-                </p>
-              </div>
-              <div className="flex items-center w-full">
-                <p className="text-accent font-semibold text-5xl">
-                  {timeLeftMonth.days}
-                </p>
-                <p className="ml-3 font-semibold text-background text-xl">
-                  days
-                </p>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center w-full">
-                <p className="text-accent font-semibold text-5xl">
-                  {Math.abs(timeLeft.hours)}
-                </p>
-                <p className="ml-3 font-semibold text-background text-xl">
-                  hours
-                </p>
-              </div>
-              <div className="flex items-center w-full">
-                <p className="text-accent font-semibold text-5xl">
-                  {Math.abs(timeLeft.minutes)}
-                </p>
-                <p className="ml-3 font-semibold text-background text-xl">
-                  minutes
-                </p>
-              </div>
-              <div className="flex items-center w-full">
-                <p className="text-accent font-semibold text-5xl">
-                  {Math.abs(timeLeft.seconds)}
-                </p>
-                <p className="ml-3 font-semibold text-background text-xl">
-                  seconds
-                </p>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+    </>
   );
 }

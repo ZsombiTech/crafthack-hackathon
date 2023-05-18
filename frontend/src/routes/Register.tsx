@@ -74,6 +74,11 @@ export default function Register() {
               <button
                 className="bg-accent px-4 py-2 rounded-lg text-white font-semibold w-28"
                 onClick={handleRegister}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleRegister();
+                  }
+                }}
               >
                 Register
               </button>

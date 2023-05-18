@@ -25,18 +25,30 @@ export default function Chat() {
   useEffect(() => {
     const getMessages = async () => {
       const messages = await getChat();
-      console.log(messages);
+      const currentMessage = {
+        message: messages.data.message,
+        isFromUser: false,
+      };
+      setCurrentMessages([...currentMessages, currentMessage]);
     };
     getMessages();
   }, []);
 
   const handleSendMessage = async () => {
+    setMessage("");
+    const messagess = [];
     const messageSend = {
       message,
       isFromUser: true,
     };
-    setCurrentMessages([...currentMessages, messageSend]);
-    await postChat(message);
+    messagess.push(messageSend);
+    const { data } = await postChat(message);
+    const currentMessage = {
+      message: data.message,
+      isFromUser: false,
+    };
+    messagess.push(currentMessage);
+    setCurrentMessages([...currentMessages, ...messagess]);
   };
 
   return (
@@ -70,6 +82,11 @@ export default function Chat() {
           <button
             className="py-3 px-8 rounded-lg bg-accent text-background font-semibold"
             onClick={handleSendMessage}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSendMessage();
+              }
+            }}
           >
             Send
           </button>

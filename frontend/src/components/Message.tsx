@@ -46,7 +46,11 @@ export const ChatComp: FC<ChatComponentProps> = ({ isFromUser, message }) => {
   return isFromUser ? (
     <div className="mt-2">
       <div className={classes.alignWithTriangle}>
-        <h3 className={classes.userProfileName}>{currentUserData.name}</h3>
+        <h3 className={classes.userProfileName}>
+          {currentUserData && currentUserData.name
+            ? currentUserData.name
+            : "You"}
+        </h3>
         <div className={classes.positionContainerRight}>
           <div className={classes.chatContainerRight}>{message}</div>
         </div>
@@ -56,7 +60,7 @@ export const ChatComp: FC<ChatComponentProps> = ({ isFromUser, message }) => {
               <div className={classes.bottomTriangleChatRight}></div>
             </div>
             <div className={classes.avatarContainerRight}>
-              {getInitials(currentUserData.name)}
+              {getInitials(currentUserData ? currentUserData.name : "You")}
             </div>
           </div>
         </div>

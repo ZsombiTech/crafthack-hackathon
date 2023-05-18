@@ -171,7 +171,8 @@ async def _get_participations(
 
     return [
         {
-            "id": participation.id
+            "id": participation.id,
+            "event": participation.event
         }
         for participation in participations
     ]
