@@ -31,8 +31,7 @@ export default function TinderCard({
   };
 
   const rejectCard = async () => {
-    /* 
-    await likeMatch({
+    /* await likeMatch({
       targetUid: id,
       likes: false,
     });*/
