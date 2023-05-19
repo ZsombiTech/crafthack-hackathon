@@ -32,12 +32,16 @@ export default function Login() {
       return alert("Please fill all the fields");
 
     setIsLoading(true);
-    const response = await login(loginState.email, loginState.password);
+    try {
+      const response = await login(loginState.email, loginState.password);
 
-    document.cookie = `token=${response.data.token}`;
-    navigate("/");
-    setIsLoading(false);
-    window.location.reload();
+      document.cookie = `token=${response.data.token}`;
+      navigate("/");
+      setIsLoading(false);
+      window.location.reload();
+    } catch (err) {
+      setIsLoading(false);
+    }
   };
 
   return (
