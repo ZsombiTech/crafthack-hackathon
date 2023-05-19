@@ -310,7 +310,7 @@ async def continue_conservation(
     # if response contains <END_CONVERSATION> continue the conservation with the <USER_STATS> message
     if "<END_CONVERSATION>" in response.choices[0].message.content:
         print("Ending conservation")
-        background_tasks.add_task(generate_user_stats, uid)
+        #background_tasks.add_task(generate_user_stats, uid)
 
     return {
         "message": response.choices[0].message.content,
@@ -438,6 +438,7 @@ def create_teams_first(user_data):
     others = []
 
     for id, user in user_data.items():
+        user['id'] = id  # add the id into the dictionary for future use
         if user['video'] > 5:
             video_experts.append(user)
         elif user['presentation'] > 5:
@@ -451,11 +452,15 @@ def create_teams_first(user_data):
     others.sort(key=lambda x: (x['age'], x['work'], x['hackathon']))
 
     teams = []
-    while video_experts and presentation_experts:
-        team = [video_experts.pop(0), presentation_experts.pop(0)]
-        while len(team) < 5 and others:
-            team.append(others.pop(0))
-        teams.append(team)
+    while len(video_experts) > 0 and len(presentation_experts) > 0:
+        team = [video_experts.pop(0)['id'], presentation_experts.pop(0)['id']]
+
+        while len(team) < 3 and len(others) > 0:
+            team.append(others.pop(0)['id'])
+
+        if len(team) == 3:
+            teams.append(team)
+
     return teams
 
 def fits_into_team(member, team, attendees):
