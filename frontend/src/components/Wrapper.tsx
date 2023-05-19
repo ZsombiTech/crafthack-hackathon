@@ -54,6 +54,9 @@ export default function Wrapper({ className, children }: any) {
   const [loading, isLoading] = useState(true);
 
   useEffect(() => {
+    if (!getCookie("token")) {
+      navigate("/login");
+    }
     if (!userProfile && getCookie("token")) {
       getUserProfile()
         .then((response) => {
