@@ -273,6 +273,10 @@ If you get the <USER_STATS> message, you have to sum up for our system what you 
 """},
 {"role": "assistant", "content": "What is your name?"}]
     
+    user_chat = Chats(uid=uid, chat_text=user_application_messages[uid])
+
+    await user_chat.save()
+
     return {
         "message": "What is your name?",
     }
@@ -294,6 +298,10 @@ async def continue_conservation(
 
     print(user_application_messages)
 
+    user_chat = await Chats.objects.get_or_none(uid=uid)
+
+    user_application_messages[uid] = user_chat.chat_text
+
     user_application_messages[uid].append({"role":"user", "content": body.message})
 
     response = openai.ChatCompletion.create(
@@ -314,13 +322,10 @@ async def continue_conservation(
         user_application_messages[uid].append({"role": "user", "content": """<USER_STATS>"""})
         print(user_application_messages[uid])
         
-        # upload the conversation to the Chats table
-        conversation = Chats(
-            user_id = uid,
-            chat_text = user_application_messages[uid]
-        )
+    # upload the conversation to the Chats table
+    user_chat.chat_text = user_application_messages[uid]
 
-        await conversation.save()
+    await user_chat.save()
 
     return {
         "message": response.choices[0].message.content,
