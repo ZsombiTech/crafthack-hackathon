@@ -19,10 +19,47 @@ interface Event {
   id: number;
 }
 
+const setCookie = (
+  key: any,
+  value: any,
+  expireDays: any,
+  expireHours: any,
+  expireMinutes: any,
+  expireSeconds: any
+) => {
+  var expireDate = new Date();
+  if (expireDays) {
+    expireDate.setDate(expireDate.getDate() + expireDays);
+  }
+  if (expireHours) {
+    expireDate.setHours(expireDate.getHours() + expireHours);
+  }
+  if (expireMinutes) {
+    expireDate.setMinutes(expireDate.getMinutes() + expireMinutes);
+  }
+  if (expireSeconds) {
+    expireDate.setSeconds(expireDate.getSeconds() + expireSeconds);
+  }
+  document.cookie =
+    key +
+    "=" +
+    escape(value) +
+    ";domain=" +
+    window.location.hostname +
+    ";path=/" +
+    ";expires=" +
+    expireDate.toUTCString();
+};
+
+function deleteCookie(name: string) {
+  setCookie(name, "", null, null, null, 1);
+}
+
 const getAllEventsAPI = async (
   setEvents: any,
   setUpComingEvents: any,
-  setLoading: any
+  setLoading: any,
+  navigate: any
 ) => {
   const events: any[] = [];
   const upComingEvents: any[] = [];
@@ -43,10 +80,14 @@ const getAllEventsAPI = async (
       setEvents(events);
       setUpComingEvents(upComingEvents);
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      deleteCookie("token");
+      navigate("/login");
+    });
 };
 
 export default function Home() {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const userProfile = useSelector((state: any) => state.userProfile);
   const isMobile = window.innerWidth < 1270;
@@ -68,7 +109,12 @@ export default function Home() {
   useEffect(() => {
     setLoading2(true);
     const callAPI = async () => {
-      await getAllEventsAPI(setEvents, setUpComingEvents, setLoading2);
+      await getAllEventsAPI(
+        setEvents,
+        setUpComingEvents,
+        setLoading2,
+        navigate
+      );
     };
 
     callAPI();
@@ -86,7 +132,7 @@ export default function Home() {
       format: eventFormat,
       prize: eventPrize,
     });
-    await getAllEventsAPI(setEvents, setUpComingEvents, setLoading2);
+    await getAllEventsAPI(setEvents, setUpComingEvents, setLoading2, navigate);
     closeModal();
   };
 
