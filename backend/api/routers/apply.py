@@ -292,6 +292,8 @@ async def continue_conservation(
     
     uid = auth.user_id
 
+    print(user_application_messages)
+
     user_application_messages[uid].append({"role":"user", "content": body.message})
 
     response = openai.ChatCompletion.create(
@@ -430,89 +432,30 @@ def match_users_post(
     print("Old team recommendations:")
     print(team_recoms)
 
-def create_teams_first(attendees):
-    # Sort the attendees by video and presentation skills
-    sorted_by_video = sorted(attendees.items(), key=lambda item: item[1]['video'], reverse=True)
-    sorted_by_presentation = sorted(attendees.items(), key=lambda item: item[1]['presentation'], reverse=True)
+def create_teams_first(user_data):
+    video_experts = []
+    presentation_experts = []
+    others = []
 
-    # Allocate attendees to the video and presentation groups
-    video = {}
-    presentation = {}
-    for attendee, details in sorted_by_video:
-        if details['video'] > 5 and attendee not in presentation:
-            video[attendee] = details
-    for attendee, details in sorted_by_presentation:
-        if details['presentation'] > 5 and attendee not in video:
-            presentation[attendee] = details
+    for id, user in user_data.items():
+        if user['video'] > 5:
+            video_experts.append(user)
+        elif user['presentation'] > 5:
+            presentation_experts.append(user)
+        else:
+            others.append(user)
 
-    # Remaining attendees are those not in video or presentation groups
-    remaining = {k: v for k, v in attendees.items() if k not in video and k not in presentation}
+    # Sort users by age, work and hackathon experience
+    video_experts.sort(key=lambda x: (x['age'], x['work'], x['hackathon']))
+    presentation_experts.sort(key=lambda x: (x['age'], x['work'], x['hackathon']))
+    others.sort(key=lambda x: (x['age'], x['work'], x['hackathon']))
 
-    teams = defaultdict(list)
-
-    # Add one person with video editing skills and one with presentation skills to each team
-    video_keys = list(video.keys())
-    presentation_keys = list(presentation.keys())
-    random.shuffle(video_keys)
-    random.shuffle(presentation_keys)
-
-    for i in range(min(len(video_keys), len(presentation_keys))):
-        teams[i].append(video_keys[i])
-        teams[i].append(presentation_keys[i])
-
-    remaining_keys = list(remaining.keys())
-    random.shuffle(remaining_keys)
-
-    # Make sure every team has at least 3 members
-    for i in range(len(teams)):
-        while len(teams[i]) < 3 and remaining_keys:  # Check if 'remaining_keys' is not empty
-            key = remaining_keys.pop()
-            teams[i].append(key)
-
-    # Try to add each of the remaining candidates to a team that will minimize diversity in age, work and hackathon experience
-    for key in list(remaining_keys):  # We create a new list to iterate over because we'll modify remaining_keys inside the loop
-        candidate = remaining[key]
-        min_difference = float('inf')
-        min_team = None
-        for team_key, team in teams.items():
-            if len(team) >= 5:
-                continue
-            age_difference = sum(abs(candidate['age'] - attendees[member]['age']) for member in team)
-            work_difference = sum(candidate['work'] != attendees[member]['work'] for member in team)
-            hackathon_difference = sum(abs(candidate['hackathon'] - attendees[member]['hackathon']) for member in team)
-            total_difference = age_difference + work_difference + hackathon_difference
-            if total_difference < min_difference:
-                min_difference = total_difference
-                min_team = team_key
-        if min_team is not None:
-            teams[min_team].append(key)
-            remaining_keys.remove(key)  # Remove the key from remaining_keys once it's assigned to a team
-
-    return dict(teams)
-
-def modify_teams(teams, dislikes, attendees):
-    # Copy of the teams to iterate over while modifying the original teams
-    teams_copy = teams.copy()
-
-    for team_id, team in teams_copy.items():
-        for member_id in team:
-            # Check if member has dislikes in the current team
-            if member_id in dislikes:
-                for disliked_member_id in dislikes[member_id]:
-                    # If a disliked member is in the same team, try to find a new team
-                    if disliked_member_id in team:
-                        for other_team_id, other_team in teams.items():
-                            # Don't move to the current team and check if there's space in the other team
-                            if team_id != other_team_id and len(other_team) < 5:
-                                # Check if the member fits into the other team
-                                if fits_into_team(member_id, other_team, attendees):
-                                    # Move the member to the other team
-                                    team.remove(member_id)
-                                    teams[other_team_id].append(member_id)
-                                    # Break out of the loop since the member has been moved
-                                    break
-                        # Break out of the loop since the member has been moved
-                        break
+    teams = []
+    while video_experts and presentation_experts:
+        team = [video_experts.pop(0), presentation_experts.pop(0)]
+        while len(team) < 5 and others:
+            team.append(others.pop(0))
+        teams.append(team)
     return teams
 
 def fits_into_team(member, team, attendees):
