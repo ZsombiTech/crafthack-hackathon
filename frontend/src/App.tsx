@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./routes/Login";
 import Register from "./routes/Register";
@@ -10,15 +10,24 @@ import Home from "./routes/Home";
 import Sidebar from "./components/Sidebar";
 import Attendees from "./routes/Attendees";
 import Settings from "./routes/Settings";
+import Dashboard from "./routes/Dashboard";
+import MobileSidebar from "./components/MobileSidebar";
+import Chat from "./routes/Chat";
+import Tinder from "./routes/Tinder";
+import Wrapper from "./components/Wrapper";
+import Motivation from "./routes/Motivation";
+import LastMinute from "./routes/LastMinute";
+
+const isMobile = window.innerWidth < 1270;
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <div className="flex">
-        <Sidebar />
+      <Wrapper className="flex">
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
         <Home />
-      </div>
+      </Wrapper>
     ),
     errorElement: <Error />,
   },
@@ -47,19 +56,64 @@ const router = createBrowserRouter([
   {
     path: "/attendees",
     element: (
-      <div className="flex">
-        <Sidebar />
+      <Wrapper className="flex">
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
         <Attendees />
-      </div>
+      </Wrapper>
     ),
   },
   {
     path: "/settings",
     element: (
-      <div className="flex">
-        <Sidebar />
+      <Wrapper className="flex">
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
         <Settings />
-      </div>
+      </Wrapper>
+    ),
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <Wrapper className="flex">
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
+        <Dashboard />
+      </Wrapper>
+    ),
+  },
+  {
+    path: "/chat",
+    element: (
+      <Wrapper className="flex">
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
+        <Chat />
+      </Wrapper>
+    ),
+  },
+  {
+    path: "/tinder",
+    element: (
+      <Wrapper className="flex">
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
+        <Tinder />
+      </Wrapper>
+    ),
+  },
+  {
+    path: "/motivation",
+    element: (
+      <Wrapper className="flex">
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
+        <Motivation />
+      </Wrapper>
+    ),
+  },
+  {
+    path: "/lastMinute",
+    element: (
+      <Wrapper className="flex">
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
+        <LastMinute />
+      </Wrapper>
     ),
   },
 ]);

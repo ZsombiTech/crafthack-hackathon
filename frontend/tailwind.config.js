@@ -9,9 +9,11 @@ module.exports = {
       accent: "#FF4081",
       secondary: "#D1C4E9",
       background: "#F3F3F3",
-    },
-    screens: {
-      "3xl": "1900px",
+      red: "#E50606",
+      "red-lightest": "#F44B4B",
+      "accent-lightest": "#fc72a1",
+      green: "#16a34a",
+      "green-lightest": "#86efac",
     },
     extend: {
       boxShadow: {

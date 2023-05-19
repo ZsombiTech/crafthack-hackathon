@@ -2,21 +2,23 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Input from "../components/Input";
 import { signupFields } from "../assets/helpers/formFields";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { register } from "../api/user";
 
 const fields = signupFields;
 let fieldsState: any = {};
 fields.forEach((field) => (fieldsState[field.id] = ""));
 
 export default function Register() {
+  const navigate = useNavigate();
   const [registerState, setRegisterState] = useState(fieldsState);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: any) => {
     setRegisterState({ ...registerState, [e.target.id]: e.target.value });
   };
 
-  const handleRegister = () => {
-    console.log(registerState);
+  const handleRegister = async () => {
     if (
       !registerState.fullname ||
       !registerState.email ||
@@ -25,8 +27,21 @@ export default function Register() {
     )
       return alert("Please fill all the fields");
 
-    if (registerState.password !== registerState.confirmPassword)
+    if (registerState.password !== registerState.confirmpassword)
       return alert("Passwords do not match");
+
+    setIsLoading(true);
+
+    const response = await register(
+      registerState.fullname,
+      registerState.email,
+      registerState.password
+    );
+
+    document.cookie = `token=${response.data.token}`;
+    window.location.reload();
+    navigate("/");
+    setIsLoading(false);
   };
 
   return (
@@ -51,12 +66,23 @@ export default function Register() {
         </form>
         <div className="flex justify-center items-center mt-4">
           <div className="flex justify-center items-center flex-col">
-            <button
-              className="bg-accent px-4 py-2 rounded-lg text-white font-semibold w-28"
-              onClick={handleRegister}
-            >
-              Register
-            </button>
+            {isLoading ? (
+              <div className="flex justify-center items-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              </div>
+            ) : (
+              <button
+                className="bg-accent px-4 py-2 rounded-lg text-white font-semibold w-28"
+                onClick={handleRegister}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleRegister();
+                  }
+                }}
+              >
+                Register
+              </button>
+            )}
             <Link to="/login" className="text-secondary font-bold text-sm mt-1">
               Or login to account
             </Link>

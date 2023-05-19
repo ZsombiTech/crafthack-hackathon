@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+orjson
+peewee-aio[asyncpg]
+py-bcrypt
+pyjwt
+openai

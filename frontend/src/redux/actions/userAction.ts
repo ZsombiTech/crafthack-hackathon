@@ -1,4 +1,4 @@
-import { SET_USER_PROFILE } from "../actionTypes/actionTypes";
+import { SET_USER_PROFILE, SET_HACKATHON } from "../actionTypes/actionTypes";
 
 const setUserProfile = (payload: any) => {
   return {
@@ -7,4 +7,11 @@ const setUserProfile = (payload: any) => {
   };
 };
 
-export { setUserProfile };
+const setHackathon = (payload: any) => {
+  return {
+    type: SET_HACKATHON,
+    payload,
+  };
+};
+
+export { setUserProfile, setHackathon };
