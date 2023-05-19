@@ -93,6 +93,10 @@ export default function Login() {
           </div>
         </div>
       </div>
+      <div className="flex bottom-0 absolute">
+        Demo login: <span className="ml-2 font-bold">jury@gmail.com</span>
+        <span className="ml-2 font-bold">Jury123</span>
+      </div>
     </div>
   );
 }

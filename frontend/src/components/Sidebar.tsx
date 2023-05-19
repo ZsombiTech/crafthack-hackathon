@@ -60,7 +60,6 @@ export default function Sidebar() {
     dispatch(setHackathon(null));
     dispatch(setUserProfile(null));
     navigate("/login");
-    window.location.reload();
   };
 
   return (

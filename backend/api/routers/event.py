@@ -78,12 +78,6 @@ async def event_post(
     auth: Auth,
     body: EventPost,
 ):
-    if not auth.is_authenticated():
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
-    
-    if not auth.is_staff():
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
-
     event = Event(
         title = body.title,
         description = body.description,
