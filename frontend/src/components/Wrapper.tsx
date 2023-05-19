@@ -5,6 +5,42 @@ import { getUserProfile } from "../api/user";
 import { setUserProfile } from "../redux/actions/userAction";
 import LoadingFullPage from "./LoadingFullPage";
 
+const setCookie = (
+  key: any,
+  value: any,
+  expireDays: any,
+  expireHours: any,
+  expireMinutes: any,
+  expireSeconds: any
+) => {
+  var expireDate = new Date();
+  if (expireDays) {
+    expireDate.setDate(expireDate.getDate() + expireDays);
+  }
+  if (expireHours) {
+    expireDate.setHours(expireDate.getHours() + expireHours);
+  }
+  if (expireMinutes) {
+    expireDate.setMinutes(expireDate.getMinutes() + expireMinutes);
+  }
+  if (expireSeconds) {
+    expireDate.setSeconds(expireDate.getSeconds() + expireSeconds);
+  }
+  document.cookie =
+    key +
+    "=" +
+    escape(value) +
+    ";domain=" +
+    window.location.hostname +
+    ";path=/" +
+    ";expires=" +
+    expireDate.toUTCString();
+};
+
+function deleteCookie(name: string) {
+  setCookie(name, "", null, null, null, 1);
+}
+
 export default function Wrapper({ className, children }: any) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,8 +60,10 @@ export default function Wrapper({ className, children }: any) {
             if (
               location.pathname !== "/login" &&
               location.pathname !== "/register"
-            )
-              window.location.href = "/login";
+            ) {
+              deleteCookie("token");
+              navigate("/login");
+            }
             isLoading(false);
           }
         })
@@ -34,8 +72,10 @@ export default function Wrapper({ className, children }: any) {
           if (
             location.pathname !== "/login" &&
             location.pathname !== "/register"
-          )
-            window.location.href = "/login";
+          ) {
+            deleteCookie("token");
+            navigate("/login");
+          }
           isLoading(false);
         });
     }

@@ -45,13 +45,14 @@ export default function Chat() {
 
   const handleSendMessage = async () => {
     setWaiting(true);
-    setMessage("");
     const messagess = [];
-    const messageSend = {
-      message,
+    const currentMessagesss = {
+      message: message,
       isFromUser: true,
     };
-    messagess.push(messageSend);
+    messagess.push(currentMessagesss);
+
+    setMessage("");
     const { data } = await postChat(message);
     if (data.message.includes("<END_CONVERSATION>")) {
       await postParticipation(hackathon.id, {
@@ -62,7 +63,7 @@ export default function Chat() {
       });
       setTimeout(() => {
         navigation("/dashboard");
-      }, 2000);
+      }, 5000);
     }
     const currentMessage = {
       message: data.message,
@@ -108,9 +109,21 @@ export default function Chat() {
           ) : (
             <button
               className="py-3 px-8 rounded-lg bg-accent text-background font-semibold"
-              onClick={handleSendMessage}
+              onClick={() => {
+                const messageSend = {
+                  message,
+                  isFromUser: true,
+                };
+                setCurrentMessages([...currentMessages, messageSend]);
+                handleSendMessage();
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
+                  const messageSend = {
+                    message,
+                    isFromUser: true,
+                  };
+                  setCurrentMessages([...currentMessages, messageSend]);
                   handleSendMessage();
                 }
               }}

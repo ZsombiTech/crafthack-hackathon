@@ -15,6 +15,8 @@ import MobileSidebar from "./components/MobileSidebar";
 import Chat from "./routes/Chat";
 import Tinder from "./routes/Tinder";
 import Wrapper from "./components/Wrapper";
+import Motivation from "./routes/Motivation";
+import LastMinute from "./routes/LastMinute";
 
 const isMobile = window.innerWidth < 1270;
 
@@ -93,6 +95,24 @@ const router = createBrowserRouter([
       <Wrapper className="flex">
         {!isMobile ? <Sidebar /> : <MobileSidebar />}
         <Tinder />
+      </Wrapper>
+    ),
+  },
+  {
+    path: "/motivation",
+    element: (
+      <Wrapper className="flex">
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
+        <Motivation />
+      </Wrapper>
+    ),
+  },
+  {
+    path: "/lastMinute",
+    element: (
+      <Wrapper className="flex">
+        {!isMobile ? <Sidebar /> : <MobileSidebar />}
+        <LastMinute />
       </Wrapper>
     ),
   },

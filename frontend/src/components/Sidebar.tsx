@@ -8,6 +8,8 @@ import { setHackathon, setUserProfile } from "../redux/actions/userAction";
 import SettingIcon from "../assets/images/settings.svg";
 import SignOutLogo from "../assets/images/signOut.svg";
 import MagnifyIcon from "../assets/images/magnifyIcon.svg";
+import BookIcon from "../assets/images/bookIcon.svg";
+import TimerIcon from "../assets/images/timer.svg";
 
 const setCookie = (
   key: any,
@@ -120,18 +122,32 @@ export default function Sidebar() {
           <div className="w-full h-px bg-background mt-8 mx-auto"></div>
           <div className="lg:visible flex flex-col items-start ml-5 md:ml-5 w-full mt-8">
             {!hackathon ? (
-              <Link
-                to="/"
-                className={`flex items-center mt-3 w-3/4 justify-start py-1.5 pl-2 md:pl-5 rounded-md hover:bg-accent ${
-                  location.pathname === "/" ? "bg-accent" : ""
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                <img src={MenuIcon} alt="Menu" className="w-4" />
-                <p className="text-background font-semibold text-sm ml-2">
-                  Hackathons
-                </p>
-              </Link>
+              <>
+                <Link
+                  to="/"
+                  className={`flex items-center mt-3 w-3/4 justify-start py-1.5 pl-2 md:pl-5 rounded-md hover:bg-accent ${
+                    location.pathname === "/" ? "bg-accent" : ""
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <img src={MenuIcon} alt="Menu" className="w-4" />
+                  <p className="text-background font-semibold text-sm ml-2">
+                    Hackathons
+                  </p>
+                </Link>
+                <Link
+                  to="/lastminute"
+                  className={`flex items-center mt-3 w-3/4 justify-start py-1.5 pl-2 md:pl-5 rounded-md hover:bg-accent ${
+                    location.pathname === "/lastminute" ? "bg-accent" : ""
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <img src={TimerIcon} alt="Menu" className="w-5" />
+                  <p className="text-background font-semibold text-sm ml-2">
+                    Last minute
+                  </p>
+                </Link>
+              </>
             ) : (
               <>
                 <Link
@@ -168,6 +184,18 @@ export default function Sidebar() {
                   <img src={MagnifyIcon} alt="Menu" className="w-4" />
                   <p className="text-background font-semibold text-sm ml-2">
                     Team Finder
+                  </p>
+                </Link>
+                <Link
+                  to="/motivation"
+                  className={`flex items-center mt-3 w-3/4 py-1.5 justify-start pl-2 md:pl-5 rounded-md hover:bg-accent ${
+                    location.pathname === "/motivation" ? "bg-accent" : ""
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <img src={BookIcon} alt="Menu" className="w-4" />
+                  <p className="text-background font-semibold text-sm ml-2">
+                    Motivation
                   </p>
                 </Link>
               </>

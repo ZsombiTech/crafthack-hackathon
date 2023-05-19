@@ -96,7 +96,7 @@ export default function EventCard({
       {isLoading && <LoadingFullPage />}
 
       <div
-        className={`w-full flex items-center mt-4 p-6 rounded-lg ${
+        className={`hover:cursor-pointer w-full flex items-center mt-4 p-6 rounded-lg ${
           !isMobile && "bg-dark-lightest border-primary border-2"
         }`}
         onClick={() => {
