@@ -57,9 +57,7 @@ export default function Sidebar() {
 
   const handleSignOut = () => {
     deleteCookie("token");
-    dispatch(setHackathon(null));
-    dispatch(setUserProfile(null));
-    navigate("/login");
+    window.location.reload();
   };
 
   return (
