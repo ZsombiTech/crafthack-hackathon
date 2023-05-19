@@ -54,28 +54,40 @@ export default function Chat() {
     messagess.push(currentMessagesss);
 
     setMessage("");
-    const { data } = await postChat(message);
-    const currentMessage = {
-      message: data.message,
-      isFromUser: false,
-    };
-    if (data.message.includes("<END_CONVERSATION>")) {
-      await postParticipation(hackathon.id, {
-        event_id: hackathon.id,
-        format: "offline",
-        needs_teammates: true,
-        description: "I need teammates",
+
+    if (currentMessages.length < 6) {
+      const { data } = await postChat(message);
+      const currentMessage = {
+        message: data.message,
+        isFromUser: false,
+      };
+      if (data.message.includes("<END_CONVERSATION>")) {
+        await postParticipation(hackathon.id, {
+          event_id: hackathon.id,
+          format: "offline",
+          needs_teammates: true,
+          description: "I need teammates",
+        });
+        currentMessage.message = currentMessage.message.replace(
+          "<END_CONVERSATION>",
+          ""
+        );
+        setTimeout(() => {
+          navigation("/dashboard");
+        }, 5000);
+      }
+
+      messagess.push(currentMessage);
+    } else {
+      messagess.push({
+        message:
+          "Thank you for your response. Your portolio was generated in the backend!",
+        isFromUser: false,
       });
-      currentMessage.message = currentMessage.message.replace(
-        "<END_CONVERSATION>",
-        ""
-      );
       setTimeout(() => {
         navigation("/dashboard");
-      }, 5000);
+      }, 3000);
     }
-
-    messagess.push(currentMessage);
     setCurrentMessages([...currentMessages, ...messagess]);
     setWaiting(false);
   };
@@ -90,10 +102,11 @@ export default function Chat() {
           className="h-[30rem] w-11/12 overflow-y-scroll rounded-lg bg-dark-lightest border-2 border-accent"
           ref={messagesContainer}
         >
-          {currentMessages.map((message) => (
+          {currentMessages.map((message, idx) => (
             <ChatComp
               isFromUser={message.isFromUser}
               message={message.message}
+              key={idx}
             />
           ))}
         </div>

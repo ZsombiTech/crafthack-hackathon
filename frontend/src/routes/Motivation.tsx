@@ -48,7 +48,9 @@ export default function Motivation() {
           Motivation for the challenge
         </h1>
         <div className="flex flex-col items-center justify-center mt-24">
-          <p className="w-3/4 text-background text-center">{motivation}</p>
+          <p className="w-3/4 text-background text-center text-xl">
+            {motivation}
+          </p>
           <button
             className="rounded-lg mt-10 bg-primary text-background font-semibold px-5 py-2"
             onClick={() => {

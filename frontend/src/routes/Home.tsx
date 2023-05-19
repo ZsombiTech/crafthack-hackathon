@@ -55,6 +55,11 @@ function deleteCookie(name: string) {
   setCookie(name, "", null, null, null, 1);
 }
 
+const getCookie = (key: any) => {
+  var keyValue = document.cookie.match("(^|;) ?" + key + "=([^;]*)(;|$)");
+  return keyValue ? keyValue[2] : null;
+};
+
 const getAllEventsAPI = async (
   setEvents: any,
   setUpComingEvents: any,
@@ -106,17 +111,20 @@ export default function Home() {
   }
 
   useEffect(() => {
-    setLoading2(true);
-    const callAPI = async () => {
-      await getAllEventsAPI(
-        setEvents,
-        setUpComingEvents,
-        setLoading2,
-        navigate
-      );
-    };
+    if (getCookie("token")) {
+      setLoading2(true);
 
-    callAPI();
+      const callAPI = async () => {
+        await getAllEventsAPI(
+          setEvents,
+          setUpComingEvents,
+          setLoading2,
+          navigate
+        );
+      };
+
+      callAPI();
+    }
   }, []);
 
   const handleCloseModal = async () => {
@@ -289,7 +297,7 @@ export default function Home() {
           <h1 className="text-background text-3xl font-semibold">Ongoing</h1>
           <div className="w-full h-px bg-background mt-3 mx-auto"></div>
           <div className="eventcontainerscroll overflow-y-scroll h-64 w-full flex flex-col items-center justify-start pr-2">
-            {events.map((event) => (
+            {events.map((event, idx) => (
               <EventCard
                 img={event.thumbnail}
                 name={event.title}
@@ -300,6 +308,7 @@ export default function Home() {
                 endTime={event.end_time}
                 isUpcoming={false}
                 id={event.id}
+                key={idx}
               />
             ))}
             {events.length === 0 && (
@@ -319,7 +328,7 @@ export default function Home() {
                 No events yet
               </p>
             )}
-            {upComingEvents.map((event) => (
+            {upComingEvents.map((event, idx) => (
               <EventCard
                 img={event.thumbnail}
                 name={event.title}
@@ -330,6 +339,7 @@ export default function Home() {
                 endTime={event.end_time}
                 isUpcoming={true}
                 id={event.id}
+                key={idx}
               />
             ))}
           </div>

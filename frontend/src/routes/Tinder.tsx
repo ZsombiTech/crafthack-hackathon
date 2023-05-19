@@ -20,8 +20,18 @@ export default function Tinder() {
 
   useEffect(() => {
     const getMatches2 = async () => {
+      const matchesArr = [];
       const { data } = await getMatches();
-      setMatches(data.teammates);
+      if (data.teammates && data.teammates.length > 0) {
+        for (let i = 0; i < data.teammates.length; i++) {
+          const keys = Object.keys(data.teammates[i]);
+          matchesArr.push({
+            id: keys[0],
+            ...data.teammates[i][keys[0]],
+          });
+        }
+        setMatches(matchesArr);
+      }
     };
     getMatches2();
   }, []);
@@ -33,18 +43,22 @@ export default function Tinder() {
     >
       {matches.length > 0 && (
         <TinderCard
-          name={matches[currentCard].name}
-          job={matches[currentCard].work}
+          name={matches[currentCard].name ?? "Kiram Doe"}
+          job={matches[currentCard].work ?? "Software Engineer"}
           image={`https://avatars.githubusercontent.com/u/561482${Math.floor(
             Math.random() * 100
           )}?v=4`}
-          description={matches[currentCard].introduction}
-          stack={matches[currentCard].stack}
-          age={matches[currentCard].age}
+          description={
+            matches[currentCard].introduction ??
+            "I am a cool persoN, I like to do cool things"
+          }
+          stack={matches[currentCard].stack ?? []}
+          age={matches[currentCard].age ?? 34}
           increaseCardCounter={() => {
             if (currentCard < matches.length - 1)
               setCurrentCard(currentCard + 1);
           }}
+          id={matches[currentCard].id}
         />
       )}
     </div>
