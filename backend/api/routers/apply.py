@@ -362,6 +362,23 @@ def create_teams():
     return {
         "teams": team_recoms
     }
+
+@router.get("/sync_teams")
+async def sync_teams():
+    # fetch the profiles table from the database
+    profiles = await Profiles.select()
+
+    # convert the profiles to a dict
+    for profile in profiles:
+        user_profiles[profile.user_id] = profile.profiles_text
+
+    print("User profiles:")
+    print(user_profiles)
+    
+    return {
+        "success": True
+    }
+
     
 @router.get("/match")
 def match_users_get(
