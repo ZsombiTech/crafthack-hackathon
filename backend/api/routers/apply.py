@@ -257,8 +257,8 @@ You are an organizer of a hackathon. Attendees write to you to apply and find te
 - Age
 - Current work or education type
 - Video editing skills
-If the user hasn't answered any of these ask back. Only ask for one piece of information at a time. Keep the answers as short as possible. If you have every information needed close the conservation in a few words, add <END_CONVERSATION> and end the message, wait for the next message.
-After this, if you get the <USER_STATS> message, you have to sum up for our system what you got to know in this json format:
+If the user hasn't answered any of these ask back. Only ask for one piece of information at a time. Keep the answers as short as possible. If you have every information needed say goodbye in a few words, add <END_CONVERSATION> and end the message, wait for the next message.
+If you get the <USER_STATS> message, you have to sum up for our system what you got to know in this json format:
 {
 "name": Name,
 "age": Age, if the user doesn't give an exact age, try an approx value based on his answers,
@@ -317,13 +317,17 @@ async def continue_conservation(
 def generate_user_stats(uid: int):
     print("Generating user stats for user with id: " + str(uid))
     user_application_messages[uid].append({"role": "user", "content": """<USER_STATS>"""})
+    print("szoszi1")
     profile_response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=user_application_messages[uid],
         temperature=0.5,
         top_p=1,
     )
+    print("szoszi2")
+
     user_application_messages[uid].append({"role": "assistant", "content": profile_response.choices[0].message.content})
+    print("szoszi3")
 
     # convert the response to a dict and return it
     try:
@@ -336,7 +340,7 @@ def generate_user_stats(uid: int):
 @router.get("/create_teams")
 def create_teams():
     global team_recoms
-    team_recoms = create_teams(user_profiles)
+    team_recoms = create_teams_first(user_profiles)
 
     print("Team recommendations:")
     print(team_recoms)
@@ -419,7 +423,7 @@ def match_users_post(
     print("Old team recommendations:")
     print(team_recoms)
 
-def create_teams(attendees):
+def create_teams_first(attendees):
     # Sort the attendees by video and presentation skills
     sorted_by_video = sorted(attendees.items(), key=lambda item: item[1]['video'], reverse=True)
     sorted_by_presentation = sorted(attendees.items(), key=lambda item: item[1]['presentation'], reverse=True)
