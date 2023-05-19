@@ -49,7 +49,6 @@ function deleteCookie(name: string) {
 
 export default function Sidebar() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const hackathon = useSelector((state: any) => state.hackathon);
   const isMobile = window.innerWidth < 1270;
