@@ -17,6 +17,10 @@ user_application_messages = {}
 
 team_recoms = []
 
+liked_users = {}
+
+disliked_users = {}
+
 # Dummy profiles
 user_profiles = {
     "1": {
@@ -365,16 +369,21 @@ def match_users_get(
     # collect data of the teammates
     teammates = []
     for teammate_id in teammate_ids:
-        teammates.append(user_profiles[teammate_id])
+        teammates.append({teammate_id: user_profiles[teammate_id]})
 
     # send the list of teammates to the user
     return {
         "teammates": teammates
     }
+
+class MatchPost(BaseModel):
+    targetUid: int = 0
+    likes: bool = False
     
 @router.post("/match")
 def match_users_post(
     auth: Auth,
+    body: MatchPost,
 ):
     uid = 1
     if not auth.is_authenticated():
@@ -384,9 +393,33 @@ def match_users_post(
     if uid != 1:
         uid = auth.user_id
 
-    return {
-        "message": "What is your name?",
-    }
+    team_id, teammate_ids = find_team(uid, team_recoms)
+    global liked_users, disliked_users
+
+    if uid not in liked_users:
+            liked_users[uid] = []
+
+    if uid not in disliked_users:
+        disliked_users[uid] = []
+
+    if body.likes:
+        # add the target user to the list of liked users
+        liked_users[uid].append(body.targetUid)
+    else:
+        disliked_users[uid].append(body.targetUid)
+
+    print(liked_users)
+    print(disliked_users)
+
+    # find the next user to match with
+    new_team = modify_teams(team_recoms, liked_users, disliked_users, user_profiles)
+
+    print("New team recommendations:")
+    print(new_team)
+    print("Old team recommendations:")
+    print(team_recoms)
+
+
     
 def create_teams(attendees):
     # First filter the attendees based on presentation and video editing skills
@@ -440,30 +473,47 @@ def create_teams(attendees):
 
     return dict(teams)
 
-def modify_teams(teams, likes, attendees):
-    # Compute the number of likes within each team
-    team_likes = {team_id: sum(member_id in likes for member_id in team)
+def modify_teams(teams, likes, dislikes, attendees):
+    # Compute the number of likes and dislikes within each team
+    team_likes = {team_id: sum(member_id in likes.get(member_id, []) for member_id in team)
                   for team_id, team in teams.items()}
 
-    # Try to move each team member to another team where they would give more likes
+    team_dislikes = {team_id: sum(member_id in dislikes.get(member_id, []) for member_id in team)
+                  for team_id, team in teams.items()}
+
+    # Try to move each team member to the best other team for them
     for team_id, team in teams.items():
         for member in team:
-            # Get the number of likes that the member gives in the current team
-            current_likes = sum(teammate_id in likes[member] for teammate_id in team)
+            # Get the number of likes and dislikes that the member gives in the current team
+            current_likes = sum(teammate_id in likes.get(member, []) for teammate_id in team)
+            current_dislikes = sum(teammate_id in dislikes.get(member, []) for teammate_id in team)
+            
+            best_team_id = None
+            best_likes = current_likes
+            best_dislikes = current_dislikes
+
+            # Look for a better team for the member
             for other_team_id, other_team in teams.items():
                 if other_team_id != team_id and len(other_team) < 5:
-                    # Get the number of likes that the member would give in the other team
-                    other_likes = sum(teammate_id in likes[member] for teammate_id in other_team)
-                    if other_likes > current_likes:
-                        # Check if the member fits into the other team
-                        if fits_into_team(member, other_team, attendees):
-                            # Move the member to the other team
-                            team.remove(member)
-                            other_team.append(member)
-                            # Update the number of likes within each team
-                            team_likes[team_id] -= current_likes
-                            team_likes[other_team_id] += other_likes
-                            break
+                    # Get the number of likes and dislikes that the member would give in the other team
+                    other_likes = sum(teammate_id in likes.get(member, []) for teammate_id in other_team)
+                    other_dislikes = sum(teammate_id in dislikes.get(member, []) for teammate_id in other_team)
+
+                    # If the other team is better and the member fits into it, remember it
+                    if other_likes - other_dislikes > best_likes - best_dislikes and fits_into_team(member, other_team, attendees):
+                        best_team_id = other_team_id
+                        best_likes = other_likes
+                        best_dislikes = other_dislikes
+
+            # If we found a better team for the member, move them there
+            if best_team_id is not None:
+                team.remove(member)
+                teams[best_team_id].append(member)
+                # Update the number of likes and dislikes within each team
+                team_likes[team_id] -= current_likes
+                team_dislikes[team_id] -= current_dislikes
+                team_likes[best_team_id] += best_likes
+                team_dislikes[best_team_id] += best_dislikes
 
     return teams
 
