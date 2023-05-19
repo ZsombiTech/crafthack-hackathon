@@ -394,7 +394,8 @@ def match_users_get(
         "presentation": 8,
         "introduction": "A dedicated university student, Alice brings full-stack expertise, an exceptional knack for presentations, and solid hackathon experience."
     },
-    "700": {
+        },{
+            "700": {
         "name": "Bob Williams",
         "age": 35,
         "stack": ["JavaScript", "Node.js", "AWS"],
@@ -405,6 +406,7 @@ def match_users_get(
         "presentation": 6,
         "introduction": "With a full-time devotion to tech, Bob's exceptional hackathon background and good video editing skills are complemented by his proficiency in DevOps."
     },
+        },{
     "701": {
         "name": "Charlie Brown",
         "age": 17,

@@ -23,18 +23,18 @@ export default function TinderCard({
   id,
 }: TinderCardProps) {
   const acceptCard = async () => {
-    await likeMatch({
+    /* await likeMatch({
       targetUid: id,
       likes: true,
-    });
+    });*/
     increaseCardCounter();
   };
 
   const rejectCard = async () => {
-    await likeMatch({
+    /* await likeMatch({
       targetUid: id,
       likes: false,
-    });
+    });*/
     increaseCardCounter();
   };
 
