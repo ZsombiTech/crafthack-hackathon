@@ -81,8 +81,7 @@ const getAllEventsAPI = async (
       setUpComingEvents(upComingEvents);
     })
     .catch((error) => {
-      deleteCookie("token");
-      navigate("/login");
+      navigate("/");
     });
 };
 

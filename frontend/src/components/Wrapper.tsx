@@ -61,8 +61,7 @@ export default function Wrapper({ className, children }: any) {
               location.pathname !== "/login" &&
               location.pathname !== "/register"
             ) {
-              deleteCookie("token");
-              navigate("/login");
+              navigate("/");
             }
             isLoading(false);
           }
@@ -73,8 +72,7 @@ export default function Wrapper({ className, children }: any) {
             location.pathname !== "/login" &&
             location.pathname !== "/register"
           ) {
-            deleteCookie("token");
-            navigate("/login");
+            navigate("/");
           }
           isLoading(false);
         });
