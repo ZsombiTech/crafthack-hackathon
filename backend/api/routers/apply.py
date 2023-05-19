@@ -243,14 +243,10 @@ router = APIRouter(
 
 @router.get("/")
 async def start_conservation(auth: Auth):
-    uid = 1
-
     if not auth.is_authenticated():
-        uid = 1
-        #raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
     
-    if uid != 1:
-        uid = auth.user_id
+    uid = auth.user_id
 
     user_application_messages[uid] = [{"role": "system", "content": """
 You are an organizer of a hackathon. Attendees write to you to apply and find teammates. We need the following information from the people:
@@ -261,8 +257,8 @@ You are an organizer of a hackathon. Attendees write to you to apply and find te
 - Age
 - Current work or education type
 - Video editing skills
-If the user hasn't answered any of these ask back. Only ask for one piece of information at a time. Keep the answers as short as possible. If you have every information needed close the conservation in a few words, add <END_CONVERSATION> and end the message, wait for the next message.
-After this, if you get the <USER_STATS> message, you have to sum up for our system what you got to know in this json format:
+If the user hasn't answered any of these ask back. Only ask for one piece of information at a time. Keep the answers as short as possible. If you have every information needed say goodbye in a few words, add <END_CONVERSATION> and end the message, wait for the next message.
+If you get the <USER_STATS> message, you have to sum up for our system what you got to know in this json format:
 {
 "name": Name,
 "age": Age, if the user doesn't give an exact age, try an approx value based on his answers,
@@ -291,15 +287,14 @@ async def continue_conservation(
     body: ApplyPost,
     background_tasks: BackgroundTasks,
 ):
-    uid = 1
     if not auth.is_authenticated():
-        uid = 1
-        #raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    
+    uid = auth.user_id
+
+    print(user_application_messages)
 
     user_application_messages[uid].append({"role":"user", "content": body.message})
-
-    if uid != 1:
-        uid = auth.user_id
 
     response = openai.ChatCompletion.create(
         model="gpt-4",
@@ -315,7 +310,7 @@ async def continue_conservation(
     # if response contains <END_CONVERSATION> continue the conservation with the <USER_STATS> message
     if "<END_CONVERSATION>" in response.choices[0].message.content:
         print("Ending conservation")
-        background_tasks.add_task(generate_user_stats, uid)
+        #background_tasks.add_task(generate_user_stats, uid)
 
     return {
         "message": response.choices[0].message.content,
@@ -324,16 +319,29 @@ async def continue_conservation(
 def generate_user_stats(uid: int):
     print("Generating user stats for user with id: " + str(uid))
     user_application_messages[uid].append({"role": "user", "content": """<USER_STATS>"""})
-    profile_response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=user_application_messages[uid],
-        temperature=0.5,
-        top_p=1,
-    )
+    print("szoszi1")
+    print(user_application_messages[uid])
+    try:
+        profile_response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=user_application_messages[uid],
+            temperature=0.5,
+            top_p=1,
+        )
+    # print the error
+    except Exception as e:
+        print(e)
+        return
+    print(profile_response)
+    print("szoszi2")
+
     user_application_messages[uid].append({"role": "assistant", "content": profile_response.choices[0].message.content})
+    print("szoszi3")
 
     # convert the response to a dict and return it
-    user_profiles[uid] = json.loads(profile_response.choices[0].message.content)
+    try:
+        user_profiles[uid] = json.loads(profile_response.choices[0].message.content)
+    except: print("somethings wrong with the response")
 
     print("User profile:")
     print(user_profiles[uid])
@@ -341,7 +349,7 @@ def generate_user_stats(uid: int):
 @router.get("/create_teams")
 def create_teams():
     global team_recoms
-    team_recoms = create_teams(user_profiles)
+    team_recoms = create_teams_first(user_profiles)
 
     print("Team recommendations:")
     print(team_recoms)
@@ -379,19 +387,24 @@ def match_users_get(
 class MatchPost(BaseModel):
     targetUid: int = 0
     likes: bool = False
+    uid: int = None
     
 @router.post("/match")
 def match_users_post(
     auth: Auth,
     body: MatchPost,
 ):
-    uid = 1
-    if not auth.is_authenticated():
+    if not body.uid:
         uid = 1
-        #raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+        if not auth.is_authenticated():
+            uid = 1
+            #raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
-    if uid != 1:
-        uid = auth.user_id
+        if uid != 1:
+            uid = auth.user_id
+
+    else:
+        uid = body.uid
 
     team_id, teammate_ids = find_team(uid, team_recoms)
     global liked_users, disliked_users
@@ -412,108 +425,41 @@ def match_users_post(
     print(disliked_users)
 
     # find the next user to match with
-    new_team = modify_teams(team_recoms, liked_users, disliked_users, user_profiles)
+    new_team = modify_teams(team_recoms, disliked_users, user_profiles)
 
     print("New team recommendations:")
     print(new_team)
     print("Old team recommendations:")
     print(team_recoms)
 
+def create_teams_first(user_data):
+    video_experts = []
+    presentation_experts = []
+    others = []
 
-    
-def create_teams(attendees):
-    # First filter the attendees based on presentation and video editing skills
-    video = {k: v for k, v in attendees.items() if v['video'] > 5}
-    presentation = {k: v for k, v in attendees.items() if v['presentation'] > 5}
-    remaining = {k: v for k, v in attendees.items() if k not in video and k not in presentation}
+    for id, user in user_data.items():
+        user['id'] = id  # add the id into the dictionary for future use
+        if user['video'] > 5:
+            video_experts.append(user)
+        elif user['presentation'] > 5:
+            presentation_experts.append(user)
+        else:
+            others.append(user)
 
-    teams = defaultdict(list)
+    # Sort users by age, work and hackathon experience
+    video_experts.sort(key=lambda x: (x['age'], x['work'], x['hackathon']))
+    presentation_experts.sort(key=lambda x: (x['age'], x['work'], x['hackathon']))
+    others.sort(key=lambda x: (x['age'], x['work'], x['hackathon']))
 
-    # Add one person with video editing skills and one with presentation skills to each team
-    video_keys = list(video.keys())
-    presentation_keys = list(presentation.keys())
-    random.shuffle(video_keys)
-    random.shuffle(presentation_keys)
+    teams = []
+    while len(video_experts) > 0 and len(presentation_experts) > 0:
+        team = [video_experts.pop(0)['id'], presentation_experts.pop(0)['id']]
 
-    for i in range(min(len(video_keys), len(presentation_keys))):
-        teams[i].append(video_keys[i])
-        teams[i].append(presentation_keys[i])
-        del video[video_keys[i]]
-        del presentation[presentation_keys[i]]
+        while len(team) < 3 and len(others) > 0:
+            team.append(others.pop(0)['id'])
 
-    # Combine the remaining candidates
-    remaining.update(video)
-    remaining.update(presentation)
-
-    remaining_keys = list(remaining.keys())
-    random.shuffle(remaining_keys)
-
-    # Make sure every team has at least 3 members
-    for i in range(len(teams)):
-        if len(teams[i]) < 3:
-            teams[i].append(remaining_keys.pop())
-
-    # Try to add each of the remaining candidates to a team that will minimize diversity in age, work and hackathon experience
-    for key in remaining_keys:
-        candidate = remaining[key]
-        min_difference = float('inf')
-        min_team = None
-        for team_key, team in teams.items():
-            if len(team) >= 5:
-                continue
-            age_difference = sum(abs(candidate['age'] - attendees[member]['age']) for member in team)
-            work_difference = sum(candidate['work'] != attendees[member]['work'] for member in team)
-            hackathon_difference = sum(abs(candidate['hackathon'] - attendees[member]['hackathon']) for member in team)
-            total_difference = age_difference + work_difference + hackathon_difference
-            if total_difference < min_difference:
-                min_difference = total_difference
-                min_team = team_key
-        if min_team is not None:
-            teams[min_team].append(key)
-
-    return dict(teams)
-
-def modify_teams(teams, likes, dislikes, attendees):
-    # Compute the number of likes and dislikes within each team
-    team_likes = {team_id: sum(member_id in likes.get(member_id, []) for member_id in team)
-                  for team_id, team in teams.items()}
-
-    team_dislikes = {team_id: sum(member_id in dislikes.get(member_id, []) for member_id in team)
-                  for team_id, team in teams.items()}
-
-    # Try to move each team member to the best other team for them
-    for team_id, team in teams.items():
-        for member in team:
-            # Get the number of likes and dislikes that the member gives in the current team
-            current_likes = sum(teammate_id in likes.get(member, []) for teammate_id in team)
-            current_dislikes = sum(teammate_id in dislikes.get(member, []) for teammate_id in team)
-            
-            best_team_id = None
-            best_likes = current_likes
-            best_dislikes = current_dislikes
-
-            # Look for a better team for the member
-            for other_team_id, other_team in teams.items():
-                if other_team_id != team_id and len(other_team) < 5:
-                    # Get the number of likes and dislikes that the member would give in the other team
-                    other_likes = sum(teammate_id in likes.get(member, []) for teammate_id in other_team)
-                    other_dislikes = sum(teammate_id in dislikes.get(member, []) for teammate_id in other_team)
-
-                    # If the other team is better and the member fits into it, remember it
-                    if other_likes - other_dislikes > best_likes - best_dislikes and fits_into_team(member, other_team, attendees):
-                        best_team_id = other_team_id
-                        best_likes = other_likes
-                        best_dislikes = other_dislikes
-
-            # If we found a better team for the member, move them there
-            if best_team_id is not None:
-                team.remove(member)
-                teams[best_team_id].append(member)
-                # Update the number of likes and dislikes within each team
-                team_likes[team_id] -= current_likes
-                team_dislikes[team_id] -= current_dislikes
-                team_likes[best_team_id] += best_likes
-                team_dislikes[best_team_id] += best_dislikes
+        if len(team) == 3:
+            teams.append(team)
 
     return teams
 
