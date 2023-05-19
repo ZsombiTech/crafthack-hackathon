@@ -55,39 +55,29 @@ export default function Chat() {
 
     setMessage("");
 
-    if (currentMessages.length < 6) {
-      const { data } = await postChat(message);
-      const currentMessage = {
-        message: data.message,
-        isFromUser: false,
-      };
-      if (data.message.includes("<END_CONVERSATION>")) {
-        await postParticipation(hackathon.id, {
-          event_id: hackathon.id,
-          format: "offline",
-          needs_teammates: true,
-          description: "I need teammates",
-        });
-        currentMessage.message = currentMessage.message.replace(
-          "<END_CONVERSATION>",
-          ""
-        );
-        setTimeout(() => {
-          navigation("/dashboard");
-        }, 5000);
-      }
-
-      messagess.push(currentMessage);
-    } else {
-      messagess.push({
-        message:
-          "Thank you for your response. Your portolio was generated in the backend!",
-        isFromUser: false,
+    const { data } = await postChat(message);
+    const currentMessage = {
+      message: data.message,
+      isFromUser: false,
+    };
+    if (data.message.includes("<END_CONVERSATION>")) {
+      await postParticipation(hackathon.id, {
+        event_id: hackathon.id,
+        format: "offline",
+        needs_teammates: true,
+        description: "I need teammates",
       });
+      currentMessage.message = currentMessage.message.replace(
+        "<END_CONVERSATION>",
+        ""
+      );
       setTimeout(() => {
         navigation("/dashboard");
-      }, 3000);
+      }, 5000);
     }
+
+    messagess.push(currentMessage);
+
     setCurrentMessages([...currentMessages, ...messagess]);
     setWaiting(false);
   };

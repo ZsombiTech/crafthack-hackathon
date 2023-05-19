@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL:
-    "https://crafthack-hackathon-backend-git-dev-hackathon-web3.vercel.app/",
+  baseURL: "https://crafthack-hackathon-backend.vercel.app/",
 });
 
 const cookies = document.cookie;
