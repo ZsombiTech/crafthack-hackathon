@@ -291,15 +291,12 @@ async def continue_conservation(
     body: ApplyPost,
     background_tasks: BackgroundTasks,
 ):
-    uid = 1
     if not auth.is_authenticated():
-        uid = 1
-        #raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    
+    uid = auth.user_id
 
     user_application_messages[uid].append({"role":"user", "content": body.message})
-
-    if uid != 1:
-        uid = auth.user_id
 
     response = openai.ChatCompletion.create(
         model="gpt-4",
@@ -426,7 +423,6 @@ def match_users_post(
     print("Old team recommendations:")
     print(team_recoms)
 
-
 def create_teams(attendees):
     # Sort the attendees by video and presentation skills
     sorted_by_video = sorted(attendees.items(), key=lambda item: item[1]['video'], reverse=True)
@@ -463,10 +459,11 @@ def create_teams(attendees):
     # Make sure every team has at least 3 members
     for i in range(len(teams)):
         while len(teams[i]) < 3 and remaining_keys:  # Check if 'remaining_keys' is not empty
-            teams[i].append(remaining_keys.pop())
+            key = remaining_keys.pop()
+            teams[i].append(key)
 
     # Try to add each of the remaining candidates to a team that will minimize diversity in age, work and hackathon experience
-    for key in remaining_keys:
+    for key in list(remaining_keys):  # We create a new list to iterate over because we'll modify remaining_keys inside the loop
         candidate = remaining[key]
         min_difference = float('inf')
         min_team = None
@@ -482,8 +479,9 @@ def create_teams(attendees):
                 min_team = team_key
         if min_team is not None:
             teams[min_team].append(key)
+            remaining_keys.remove(key)  # Remove the key from remaining_keys once it's assigned to a team
 
-    return dict(teams)    
+    return dict(teams)
 
 def modify_teams(teams, dislikes, attendees):
     # Copy of the teams to iterate over while modifying the original teams
