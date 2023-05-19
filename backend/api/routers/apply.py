@@ -3,7 +3,7 @@ from fastapi.responses import ORJSONResponse
 
 from pydantic import BaseModel
 
-from api.models import User, Participation
+from api.models import User, Participation, Chats, Profiles
 from api.dependencies import Auth
 
 import openai
@@ -310,7 +310,17 @@ async def continue_conservation(
     # if response contains <END_CONVERSATION> continue the conservation with the <USER_STATS> message
     if "<END_CONVERSATION>" in response.choices[0].message.content:
         print("Ending conservation")
-        #background_tasks.add_task(generate_user_stats, uid)
+        print("Generating user stats for user with id: " + str(uid))
+        user_application_messages[uid].append({"role": "user", "content": """<USER_STATS>"""})
+        print(user_application_messages[uid])
+        
+        # upload the conversation to the Chats table
+        conversation = Chats(
+            user_id = uid,
+            chat_text = user_application_messages[uid]
+        )
+
+        await conversation.save()
 
     return {
         "message": response.choices[0].message.content,
@@ -321,18 +331,13 @@ def generate_user_stats(uid: int):
     user_application_messages[uid].append({"role": "user", "content": """<USER_STATS>"""})
     print("szoszi1")
     print(user_application_messages[uid])
-    try:
-        profile_response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=user_application_messages[uid],
-            temperature=0.5,
-            top_p=1,
-        )
-    # print the error
-    except Exception as e:
-        print(e)
-        return
-    print(profile_response)
+    
+    # upload the conversation to the Chats table
+    conversation = Chats(
+        user_id = uid,
+        chat_text = user_application_messages[uid]
+    )
+
     print("szoszi2")
 
     user_application_messages[uid].append({"role": "assistant", "content": profile_response.choices[0].message.content})
@@ -362,14 +367,76 @@ def create_teams():
 def match_users_get(
     auth: Auth,
 ):
-    print("Matching users")
-    uid = 1
     if not auth.is_authenticated():
-        uid = 1
-        #raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    """
+    uid = auth.user_id
 
-    if uid != 1:
-        uid = auth.user_id
+    # find which team the user is in
+    team_id, teammate_ids = find_team(uid, team_recoms)
+
+    # collect data of the teammates
+    teammates = []
+    for teammate_id in teammate_ids:
+        teammates.append({teammate_id: user_profiles[teammate_id]})"""
+
+    # send the list of teammates to the user
+    return {
+        "teammates": [{
+            "699": {
+        "name": "Alice Johnson",
+        "age": 22,
+        "stack": ["Python", "Django", "React"],
+        "hackathon": 7,
+        "work": "University",
+        "direction": "fullstack",
+        "video": 2,
+        "presentation": 8,
+        "introduction": "A dedicated university student, Alice brings full-stack expertise, an exceptional knack for presentations, and solid hackathon experience."
+    },
+    "700": {
+        "name": "Bob Williams",
+        "age": 35,
+        "stack": ["JavaScript", "Node.js", "AWS"],
+        "hackathon": 9,
+        "work": "Fulltime",
+        "direction": "devops",
+        "video": 5,
+        "presentation": 6,
+        "introduction": "With a full-time devotion to tech, Bob's exceptional hackathon background and good video editing skills are complemented by his proficiency in DevOps."
+    },
+    "701": {
+        "name": "Charlie Brown",
+        "age": 17,
+        "stack": ["HTML", "CSS", "JavaScript"],
+        "hackathon": 3,
+        "work": "high school",
+        "direction": "frontend",
+        "video": 7,
+        "presentation": 5,
+        "introduction": "A high school wiz, Charlie Brown couples a budding talent in front-end technologies with above-average video editing skills."
+    },
+        }]
+    }
+
+
+class MatchPost(BaseModel):
+    targetUid: int = 0
+    likes: bool = False
+    uid: int = None
+    
+@router.post("/match")
+def match_users_post_gut(
+    auth: Auth,
+    body: MatchPost,
+):
+    if not auth.is_authenticated():
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+    
+    uid = auth.user_id
+
+    # find which team the user is in
+    team_recoms = create_teams_first(user_profiles)
 
     # find which team the user is in
     team_id, teammate_ids = find_team(uid, team_recoms)
@@ -384,12 +451,8 @@ def match_users_get(
         "teammates": teammates
     }
 
-class MatchPost(BaseModel):
-    targetUid: int = 0
-    likes: bool = False
-    uid: int = None
-    
-@router.post("/match")
+
+
 def match_users_post(
     auth: Auth,
     body: MatchPost,
@@ -432,36 +495,57 @@ def match_users_post(
     print("Old team recommendations:")
     print(team_recoms)
 
-def create_teams_first(user_data):
-    video_experts = []
-    presentation_experts = []
-    others = []
+def create_teams_first(attendees):
+    # First filter the attendees based on presentation and video editing skills
+    video = {k: v for k, v in attendees.items() if v['video'] > 5}
+    presentation = {k: v for k, v in attendees.items() if v['presentation'] > 5}
+    remaining = {k: v for k, v in attendees.items() if k not in video and k not in presentation}
 
-    for id, user in user_data.items():
-        user['id'] = id  # add the id into the dictionary for future use
-        if user['video'] > 5:
-            video_experts.append(user)
-        elif user['presentation'] > 5:
-            presentation_experts.append(user)
-        else:
-            others.append(user)
+    teams = defaultdict(list)
 
-    # Sort users by age, work and hackathon experience
-    video_experts.sort(key=lambda x: (x['age'], x['work'], x['hackathon']))
-    presentation_experts.sort(key=lambda x: (x['age'], x['work'], x['hackathon']))
-    others.sort(key=lambda x: (x['age'], x['work'], x['hackathon']))
+    # Add one person with video editing skills and one with presentation skills to each team
+    video_keys = list(video.keys())
+    presentation_keys = list(presentation.keys())
+    random.shuffle(video_keys)
+    random.shuffle(presentation_keys)
 
-    teams = []
-    while len(video_experts) > 0 and len(presentation_experts) > 0:
-        team = [video_experts.pop(0)['id'], presentation_experts.pop(0)['id']]
+    for i in range(min(len(video_keys), len(presentation_keys))):
+        teams[i].append(video_keys[i])
+        teams[i].append(presentation_keys[i])
+        del video[video_keys[i]]
+        del presentation[presentation_keys[i]]
 
-        while len(team) < 3 and len(others) > 0:
-            team.append(others.pop(0)['id'])
+    # Combine the remaining candidates
+    remaining.update(video)
+    remaining.update(presentation)
 
-        if len(team) == 3:
-            teams.append(team)
+    remaining_keys = list(remaining.keys())
+    random.shuffle(remaining_keys)
 
-    return teams
+    # Make sure every team has at least 3 members
+    for i in range(len(teams)):
+        if len(teams[i]) < 3:
+            teams[i].append(remaining_keys.pop())
+
+    # Try to add each of the remaining candidates to a team that will minimize diversity in age, work and hackathon experience
+    for key in remaining_keys:
+        candidate = remaining[key]
+        min_difference = float('inf')
+        min_team = None
+        for team_key, team in teams.items():
+            if len(team) >= 5:
+                continue
+            age_difference = sum(abs(candidate['age'] - attendees[member]['age']) for member in team)
+            work_difference = sum(candidate['work'] != attendees[member]['work'] for member in team)
+            hackathon_difference = sum(abs(candidate['hackathon'] - attendees[member]['hackathon']) for member in team)
+            total_difference = age_difference + work_difference + hackathon_difference
+            if total_difference < min_difference:
+                min_difference = total_difference
+                min_team = team_key
+        if min_team is not None:
+            teams[min_team].append(key)
+
+    return dict(teams)
 
 def fits_into_team(member, team, attendees):
     # Check diversity in age, work and hackathon experience
@@ -482,7 +566,6 @@ def fits_into_team(member, team, attendees):
         return False
 
     return True
-
 def find_team(uid, teams):
     print(teams, "teamssss")
     print(uid, "uid")

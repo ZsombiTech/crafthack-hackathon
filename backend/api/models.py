@@ -153,3 +153,21 @@ class Participation(AIOModel):
 
     class Meta:
         table_name = "participations"
+
+@manager.register
+class Profiles(AIOModel):
+    id = fields.AutoField()
+    profiles_text = fields.TextField()
+    user_id = fields.IntegerField()
+
+    class Meta:
+        table_name = "profiles"
+
+@manager.register
+class Chats(AIOModel):
+    id = fields.AutoField()
+    chat_text = fields.TextField()
+    user_id = fields.IntegerField()
+
+    class Meta:
+        table_name = "chats"
