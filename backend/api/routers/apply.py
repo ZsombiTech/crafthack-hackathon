@@ -243,14 +243,10 @@ router = APIRouter(
 
 @router.get("/")
 async def start_conservation(auth: Auth):
-    uid = 1
-
     if not auth.is_authenticated():
-        uid = 1
-        #raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
     
-    if uid != 1:
-        uid = auth.user_id
+    uid = auth.user_id
 
     user_application_messages[uid] = [{"role": "system", "content": """
 You are an organizer of a hackathon. Attendees write to you to apply and find teammates. We need the following information from the people:
