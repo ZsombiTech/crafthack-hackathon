@@ -41,6 +41,11 @@ export function deleteCookie(name: string) {
   setCookie(name, "", null, null, null, 1);
 }
 
+const getCookie = (key: any) => {
+  var keyValue = document.cookie.match("(^|;) ?" + key + "=([^;]*)(;|$)");
+  return keyValue ? keyValue[2] : null;
+};
+
 export default function Wrapper({ className, children }: any) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,7 +54,7 @@ export default function Wrapper({ className, children }: any) {
   const [loading, isLoading] = useState(true);
 
   useEffect(() => {
-    if (!userProfile) {
+    if (!userProfile && getCookie("token")) {
       getUserProfile()
         .then((response) => {
           if (response?.data.email) {

@@ -9,6 +9,15 @@ export const getMatches = async () => {
   }
 };
 
+export const likeMatch = async (data: any) => {
+  try {
+    const response = await axios.post("/apply/match", data);
+    return response;
+  } catch (error) {
+    return { data: [] };
+  }
+};
+
 export const makeTeams = async () => {
   try {
     const response = await axios.get("/apply/create_teams");

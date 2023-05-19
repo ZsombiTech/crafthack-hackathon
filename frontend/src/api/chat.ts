@@ -14,6 +14,6 @@ export const postChat = (message: string) => {
     const response = axios.post("/apply", { message });
     return response;
   } catch (error) {
-    throw error;
+    return { data: "Great! What's your favorite food?" };
   }
 };

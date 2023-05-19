@@ -1,4 +1,5 @@
 import React from "react";
+import { likeMatch } from "../api/apply";
 
 interface TinderCardProps {
   name: string;
@@ -8,6 +9,7 @@ interface TinderCardProps {
   stack: string[];
   age: number;
   increaseCardCounter: () => void;
+  id: number;
 }
 
 export default function TinderCard({
@@ -18,12 +20,21 @@ export default function TinderCard({
   stack,
   age,
   increaseCardCounter,
+  id,
 }: TinderCardProps) {
-  const acceptCard = () => {
+  const acceptCard = async () => {
+    await likeMatch({
+      targetUid: id,
+      likes: true,
+    });
     increaseCardCounter();
   };
 
-  const rejectCard = () => {
+  const rejectCard = async () => {
+    await likeMatch({
+      targetUid: id,
+      likes: false,
+    });
     increaseCardCounter();
   };
 
@@ -36,8 +47,11 @@ export default function TinderCard({
         <h1 className="text-lg font-semibold mt-1">{age} years old</h1>
       </div>
       <div className="flex items-centerm mt-3">
-        {stack.map((tag) => (
-          <div className="bg-accent rounded-lg px-2 py-1 mx-1 mb-2 md:mb-0">
+        {stack.map((tag, idx) => (
+          <div
+            className="bg-accent rounded-lg px-2 py-1 mx-1 mb-2 md:mb-0"
+            key={idx}
+          >
             <p className="text-background text-sm">{tag}</p>
           </div>
         ))}

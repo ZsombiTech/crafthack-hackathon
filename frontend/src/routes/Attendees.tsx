@@ -17,22 +17,24 @@ export default function Attendees() {
     if (!hackathon) {
       navigation("/");
     }
-    const getAttendees = async () => {
-      setIsWaiting(true);
-      const userIds = [];
-      const attendees = [];
-      const { data } = await getAllParticipantsForEvent(hackathon.id);
-      for (let i = 0; i < data.attendees.length; i++) {
-        userIds.push(data.attendees[i].__data__.user);
-      }
-      for (let i = 0; i < userIds.length; i++) {
-        const { data } = await getByUserId(userIds[i]);
-        attendees.push(data);
-      }
-      setAttendees(attendees);
-      setIsWaiting(false);
-    };
-    getAttendees();
+    if (hackathon) {
+      const getAttendees = async () => {
+        setIsWaiting(true);
+        const userIds = [];
+        const attendees = [];
+        const { data } = await getAllParticipantsForEvent(hackathon.id);
+        for (let i = 0; i < data.attendees.length; i++) {
+          userIds.push(data.attendees[i].__data__.user);
+        }
+        for (let i = 0; i < userIds.length; i++) {
+          const { data } = await getByUserId(userIds[i]);
+          attendees.push(data);
+        }
+        setAttendees(attendees);
+        setIsWaiting(false);
+      };
+      getAttendees();
+    }
   }, []);
 
   return (
@@ -47,14 +49,16 @@ export default function Attendees() {
               <h1 className="text-background font-semibold text-lg">Status</h1>
               <h1 className="text-background font-semibold text-lg">Email</h1>
             </div>
-            {attendees.map((attendee: any) => (
-              <AttendeeCard
-                name={attendee.name}
-                format={"offline"}
-                email={attendee.email}
-              />
-            ))}
-            {attendees.length === 0 && (
+            {attendees &&
+              attendees.map((attendee: any, idx: number) => (
+                <AttendeeCard
+                  name={attendee.name}
+                  format={"offline"}
+                  email={attendee.email}
+                  key={idx}
+                />
+              ))}
+            {attendees && attendees.length === 0 && (
               <h1 className="mt-5 text-background font-semibold text-lg text-center w-full">
                 No attendees yet
               </h1>
