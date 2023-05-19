@@ -318,12 +318,19 @@ def generate_user_stats(uid: int):
     print("Generating user stats for user with id: " + str(uid))
     user_application_messages[uid].append({"role": "user", "content": """<USER_STATS>"""})
     print("szoszi1")
-    profile_response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=user_application_messages[uid],
-        temperature=0.5,
-        top_p=1,
-    )
+    print(user_application_messages[uid])
+    try:
+        profile_response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=user_application_messages[uid],
+            temperature=0.5,
+            top_p=1,
+        )
+    # print the error
+    except Exception as e:
+        print(e)
+        return
+    print(profile_response)
     print("szoszi2")
 
     user_application_messages[uid].append({"role": "assistant", "content": profile_response.choices[0].message.content})
