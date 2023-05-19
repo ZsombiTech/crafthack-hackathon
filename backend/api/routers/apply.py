@@ -369,7 +369,7 @@ def match_users_get(
 ):
     if not auth.is_authenticated():
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)
-    
+    """
     uid = auth.user_id
 
     # find which team the user is in
@@ -378,11 +378,45 @@ def match_users_get(
     # collect data of the teammates
     teammates = []
     for teammate_id in teammate_ids:
-        teammates.append({teammate_id: user_profiles[teammate_id]})
+        teammates.append({teammate_id: user_profiles[teammate_id]})"""
 
     # send the list of teammates to the user
     return {
-        "teammates": teammates
+        "teammates": [{
+            "699": {
+        "name": "Alice Johnson",
+        "age": 22,
+        "stack": ["Python", "Django", "React"],
+        "hackathon": 7,
+        "work": "University",
+        "direction": "fullstack",
+        "video": 2,
+        "presentation": 8,
+        "introduction": "A dedicated university student, Alice brings full-stack expertise, an exceptional knack for presentations, and solid hackathon experience."
+    },
+    "700": {
+        "name": "Bob Williams",
+        "age": 35,
+        "stack": ["JavaScript", "Node.js", "AWS"],
+        "hackathon": 9,
+        "work": "Fulltime",
+        "direction": "devops",
+        "video": 5,
+        "presentation": 6,
+        "introduction": "With a full-time devotion to tech, Bob's exceptional hackathon background and good video editing skills are complemented by his proficiency in DevOps."
+    },
+    "701": {
+        "name": "Charlie Brown",
+        "age": 17,
+        "stack": ["HTML", "CSS", "JavaScript"],
+        "hackathon": 3,
+        "work": "high school",
+        "direction": "frontend",
+        "video": 7,
+        "presentation": 5,
+        "introduction": "A high school wiz, Charlie Brown couples a budding talent in front-end technologies with above-average video editing skills."
+    },
+        }]
     }
 
 
