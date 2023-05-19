@@ -1,3 +1,4 @@
+import { deleteCookie } from "../components/Wrapper";
 import axios from "../config/axios";
 
 export const login = async (email: string, password: string) => {
@@ -34,7 +35,10 @@ export const getUserProfile = async () => {
     const response = await axios.get("/user/me");
     return response;
   } catch (error) {
-    throw error;
+    if ((error as any).response.status === 401) {
+      deleteCookie("token");
+      window.location.href = "/login";
+    }
   }
 };
 

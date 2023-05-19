@@ -1,3 +1,4 @@
+import { deleteCookie } from "../components/Wrapper";
 import axios from "../config/axios";
 
 export const getAllEvents = async () => {
@@ -5,7 +6,10 @@ export const getAllEvents = async () => {
     const response = await axios.get("/event");
     return response;
   } catch (error) {
-    throw error;
+    if ((error as any).response.status === 401) {
+      deleteCookie("token");
+      window.location.href = "/login";
+    }
   }
 };
 

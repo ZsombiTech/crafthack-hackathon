@@ -37,7 +37,7 @@ const setCookie = (
     expireDate.toUTCString();
 };
 
-function deleteCookie(name: string) {
+export function deleteCookie(name: string) {
   setCookie(name, "", null, null, null, 1);
 }
 
@@ -52,8 +52,8 @@ export default function Wrapper({ className, children }: any) {
     if (!userProfile) {
       getUserProfile()
         .then((response) => {
-          if (response.data.email) {
-            dispatch(setUserProfile(response.data));
+          if (response?.data.email) {
+            dispatch(setUserProfile(response?.data));
             isLoading(false);
           } else {
             dispatch(setUserProfile(null));
@@ -61,8 +61,7 @@ export default function Wrapper({ className, children }: any) {
               location.pathname !== "/login" &&
               location.pathname !== "/register"
             ) {
-              deleteCookie("token");
-              navigate("/login");
+              navigate("/");
             }
             isLoading(false);
           }
@@ -73,8 +72,7 @@ export default function Wrapper({ className, children }: any) {
             location.pathname !== "/login" &&
             location.pathname !== "/register"
           ) {
-            deleteCookie("token");
-            navigate("/login");
+            navigate("/");
           }
           isLoading(false);
         });
