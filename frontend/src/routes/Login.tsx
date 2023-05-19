@@ -36,9 +36,9 @@ export default function Login() {
       const response = await login(loginState.email, loginState.password);
 
       document.cookie = `token=${response.data.token}`;
+      window.location.reload();
       navigate("/");
       setIsLoading(false);
-      window.location.reload();
     } catch (err) {
       setIsLoading(false);
     }

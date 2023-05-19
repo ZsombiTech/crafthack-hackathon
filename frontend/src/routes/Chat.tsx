@@ -4,6 +4,7 @@ import { getChat, postChat } from "../api/chat";
 import { useNavigate } from "react-router-dom";
 import { postParticipation } from "../api/event";
 import { useSelector } from "react-redux";
+import { makeTeams } from "../api/apply";
 
 interface Message {
   message: string;
@@ -54,6 +55,10 @@ export default function Chat() {
 
     setMessage("");
     const { data } = await postChat(message);
+    const currentMessage = {
+      message: data.message,
+      isFromUser: false,
+    };
     if (data.message.includes("<END_CONVERSATION>")) {
       await postParticipation(hackathon.id, {
         event_id: hackathon.id,
@@ -61,14 +66,15 @@ export default function Chat() {
         needs_teammates: true,
         description: "I need teammates",
       });
+      currentMessage.message = currentMessage.message.replace(
+        "<END_CONVERSATION>",
+        ""
+      );
       setTimeout(() => {
         navigation("/dashboard");
       }, 5000);
     }
-    const currentMessage = {
-      message: data.message,
-      isFromUser: false,
-    };
+
     messagess.push(currentMessage);
     setCurrentMessages([...currentMessages, ...messagess]);
     setWaiting(false);

@@ -37,7 +37,7 @@ const setCookie = (
     expireDate.toUTCString();
 };
 
-function deleteCookie(name: string) {
+export function deleteCookie(name: string) {
   setCookie(name, "", null, null, null, 1);
 }
 
@@ -52,8 +52,8 @@ export default function Wrapper({ className, children }: any) {
     if (!userProfile) {
       getUserProfile()
         .then((response) => {
-          if (response.data.email) {
-            dispatch(setUserProfile(response.data));
+          if (response?.data.email) {
+            dispatch(setUserProfile(response?.data));
             isLoading(false);
           } else {
             dispatch(setUserProfile(null));

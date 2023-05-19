@@ -64,7 +64,7 @@ const getAllEventsAPI = async (
   const events: any[] = [];
   const upComingEvents: any[] = [];
   getAllEvents()
-    .then(({ data }) => {
+    .then(({ data }: any) => {
       const currentDate = new Date();
       data.map((event: Event) => {
         const startDate = new Date(event.start_time * 1000);

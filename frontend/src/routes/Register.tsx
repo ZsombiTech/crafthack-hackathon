@@ -39,9 +39,9 @@ export default function Register() {
     );
 
     document.cookie = `token=${response.data.token}`;
+    window.location.reload();
     navigate("/");
     setIsLoading(false);
-    window.location.reload();
   };
 
   return (
